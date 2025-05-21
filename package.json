@@ -15,6 +15,6 @@
     "devDependencies": {
         "laravel-vite-plugin": "^1.0",
         "sass": "^1.80",
-        "vite": "^6.2"
+        "vite": "^6.3"
     }
 }
