@@ -1,0 +1,76 @@
+name: Create release package
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - v*
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    name: Build
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set env
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV &&
+          echo "PKG_NAME=`basename $GITHUB_REPOSITORY -private`" >> $GITHUB_ENV
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          registry-url: "https://npm.pkg.github.com"
+          cache-dependency-path: "**/package-lock.json"
+
+      - name: Install npm dependencies
+        run: |
+          echo "//npm.pkg.github.com/:_authToken=$NODE_AUTH_TOKEN"  >> ~/.npmrc
+          npm ci --ignore-scripts
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.REPO_READ_ONLY_TOKEN }}
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@master
+        with:
+          php-version: 8.3
+
+      - name: Composer install
+        env:
+          COMPOSER_AUTH: '{"github-oauth": {"github.com": "${{ secrets.REPO_READ_ONLY_TOKEN }}"}}'
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist --no-dev
+
+      - name: Prepare Storage Directories
+        run: |
+          mkdir -p storage/framework/{sessions,views,cache}
+          mkdir -p storage/logs
+          touch storage/logs/laravel.log
+          chmod -R 775 storage
+
+      - name: Run build task
+        run: npm run build
+
+      - name: Clean build
+        run: |
+          rm -r node_modules .git
+
+      - name: Clear config cache
+        run: php artisan config:clear
+
+      - name: Clear route cache
+        run: php artisan route:clear
+
+      - name: Create version.json
+        run: |
+          echo "{ \"version\": \"${{ env.RELEASE_VERSION }}\", \"git_ref\": \"$GITHUB_SHA\"}" > public/version.json
+
+      - name: Create tar
+        run: tar -czf ${{ env.PKG_NAME }}_${{ env.RELEASE_VERSION }}.tar.gz ./app ./bootstrap ./config ./database ./public ./resources ./routes ./storage ./vendor ./.env.example ./artisan ./composer.json ./composer.lock
+
+      - name: Upload release tar
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.PKG_NAME }}_${{ env.RELEASE_VERSION }}
+          path: ${{ env.PKG_NAME }}_${{ env.RELEASE_VERSION }}.tar.gz

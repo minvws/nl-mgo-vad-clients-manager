@@ -1,0 +1,24 @@
+includes:
+    - phpstan-baseline.neon
+
+parameters:
+    paths:
+        - .
+    excludePaths:
+        - bootstrap/cache
+        - public/
+        - storage/
+        - tests/
+        - vendor/
+        - _ide_helper.php
+    level: max
+    stubFiles:
+        - phpstan/Builder.stub
+    exceptions:
+        check:
+            missingCheckedExceptionInThrows: true
+            tooWideThrowType: true
+        uncheckedExceptionClasses:
+            - 'LogicException'
+            - 'RuntimeException'
+    editorUrl: 'phpstorm://open?file=%%file%%&line=%%line%%'

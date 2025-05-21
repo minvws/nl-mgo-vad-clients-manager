@@ -1,0 +1,20 @@
+{
+    "private": true,
+    "type": "module",
+    "license": "EUPL-1.2",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "watch": "vite build --watch",
+        "dependencies": "npm run build"
+    },
+    "dependencies": {
+        "@minvws/manon": "beta",
+        "@minvws/manon-themes": "beta"
+    },
+    "devDependencies": {
+        "laravel-vite-plugin": "^1.0",
+        "sass": "^1.80",
+        "vite": "^6.2"
+    }
+}

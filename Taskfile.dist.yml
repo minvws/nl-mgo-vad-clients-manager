@@ -1,0 +1,146 @@
+version: '3'
+
+tasks:
+  init:
+    desc: Initialize the application and services
+    deps: [env:check]
+    cmds:
+      - |
+        docker run -it --rm \
+        -u "$(id -u):$(id -g)" \
+        -v "$(pwd):/var/www/html" \
+        -v "$HOME/.config/composer:/.composer" \
+        -v "$HOME/.composer/auth.json:/.composer/auth.json" \
+        -w /var/www/html \
+        laravelsail/php83-composer:latest \
+        composer install --ignore-platform-reqs --no-scripts
+      - task: up
+      - task: key-generate
+      - task: npm:install
+      - task: frontend:build
+      - task: db:fresh
+      - task: create-test-user
+
+  env:check:
+    desc: Check the environment
+    cmds:
+      - |
+        if [ ! -f ".env" ]; then
+          cp .env.example .env
+        fi
+
+  env:clear:
+    desc: Clear the environment
+    cmds:
+      - rm -f .env
+      - task: env:check
+
+  up:
+    desc: Start the application and services
+    deps: [env:check]
+    cmds:
+      - vendor/bin/sail up -d --remove-orphans
+
+  down:
+    desc: Stop the application and services
+    cmds:
+      - vendor/bin/sail down --remove-orphans
+
+  stop:
+    desc: Stop the application and services
+    cmds:
+      - vendor/bin/sail stop
+
+  composer:install:
+    desc: Install composer dependencies
+    cmds:
+      - vendor/bin/sail composer install
+
+  composer:update:
+    desc: Update composer dependencies
+    cmds:
+      - vendor/bin/sail composer update
+
+  npm:install:
+    desc: Install npm dependencies
+    cmds:
+      - vendor/bin/sail npm install
+
+  npm:update:
+    desc: Update npm dependencies
+    cmds:
+      - vendor/bin/sail npm update
+
+  frontend:build:
+    desc: Build the frontend
+    cmds:
+      - vendor/bin/sail npm run build
+
+  frontend:watch:
+    desc: Build and watch the frontend
+    cmds:
+      - vendor/bin/sail npm run watch
+
+  db:migrate:
+    desc: Run database migrations
+    cmds:
+      - vendor/bin/sail artisan migrate
+
+  db:fresh:
+    desc: Create a fresh database
+    cmds:
+      - echo "Running vendor/bin/sail artisan migrate:fresh"
+      - vendor/bin/sail artisan migrate:fresh --seed -v
+
+  update-all:
+    desc: Update the application and services
+    cmds:
+      - task: composer:update
+      - task: npm:update
+
+  test:
+    desc: Run the test suite
+    cmds:
+      - vendor/bin/sail composer run-script test
+
+  create-test-user:
+    desc: Create a test user
+    cmds:
+     - vendor/bin/sail artisan user:create-admin admin@example.com Admin
+
+  key-generate:
+    cmds:
+      - vendor/bin/sail artisan key:generate
+
+  lint:phpcs:
+    desc: Lint PHP files
+    cmds:
+      - vendor/bin/sail composer run-script phpcs
+
+  lint:phpcbf:
+    desc: Lint and fix PHP files
+    cmds:
+      - vendor/bin/sail composer run-script phpcbf
+
+  lint:phpstan:
+    desc: Run PHPStan
+    cmds:
+     - vendor/bin/sail composer run-script phpstan
+
+  lint:phpmd:
+    desc: Run PHPMD
+    cmds:
+      - vendor/bin/sail composer run-script phpmd
+
+  lint:security:
+    desc: Run security checks
+    cmds:
+      - vendor/bin/sail artisan security-check:now
+
+  lint:all:
+    desc: Run all linters
+    cmds:
+      - task: lint:phpcs
+      - task: lint:phpstan
+      - task: lint:phpmd
+      - task: lint:security

@@ -1,0 +1,118 @@
+{
+    "name": "minvws/nl-mgo-vad-clients-manager",
+    "type": "project",
+    "description": "A web application to manager clients for MinVWS MGO VAD environment.",
+    "keywords": [
+        "laravel",
+        "vad"
+    ],
+    "license": "EUPL-1.2",
+    "require": {
+        "php": "^8.3",
+        "laravel/fortify": "^1.21",
+        "laravel/framework": "^11.9",
+        "laravel/tinker": "^2.9",
+        "minvws/laravel-logging": "^3.1",
+        "minvws/laravel-sql-exporter": "^1.1",
+        "secondnetwork/blade-tabler-icons": "^3.31",
+        "spatie/laravel-csp": "^2.10"
+    },
+    "require-dev": {
+        "barryvdh/laravel-debugbar": "^3.13",
+        "barryvdh/laravel-ide-helper": "^3.1",
+        "fakerphp/faker": "^1.23",
+        "jorijn/laravel-security-checker": "^2.5",
+        "laravel/breeze": "^2.1",
+        "laravel/pint": "^1.13",
+        "laravel/sail": "^1.30",
+        "mockery/mockery": "^1.6",
+        "nunomaduro/collision": "^8.0",
+        "pestphp/pest": "^3.7",
+        "phpmd/phpmd": "^2.15",
+        "phpstan/extension-installer": "^1.4",
+        "slevomat/coding-standard": "^8.15",
+        "squizlabs/php_codesniffer": "^3.10"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/",
+            "Database\\Factories\\": "database/factories/",
+            "Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "git@github.com:minvws/nl-rdo-php-audit-logger.git"
+        },
+        {
+            "type": "vcs",
+            "url": "git@github.com:minvws/nl-rdo-laravel-logging.git"
+        },
+        {
+            "type": "git",
+            "url": "git@github.com:minvws/nl-rdo-laravel-sql-export.git"
+        }
+    ],
+    "scripts": {
+        "quality": [
+            "@phpcs",
+            "@phpmd",
+            "@phpstan",
+            "@test"
+        ],
+        "post-autoload-dump": [
+            "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+            "@php artisan package:discover --ansi",
+            "@php artisan optimize:clear"
+        ],
+        "post-update-cmd": [
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
+        ],
+        "post-root-package-install": [
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+        ],
+        "post-create-project-cmd": [
+            "vendor/bin/sail up -d --remove-orphans",
+            "vendor/bin/sail artisan key:generate --ansi",
+            "vendor/bin/sail artisan migrate --graceful --ansi",
+            "vendor/bin/sail npm ci --ansi",
+            "vendor/bin/sail npm run build --ansi",
+            "vendor/bin/sail artisan user:create-admin admin@example.com Admin --ansi"
+        ],
+        "phpcbf": "vendor/bin/phpcbf -n",
+        "phpcs": "vendor/bin/phpcs -n",
+        "phpmd": "vendor/bin/phpmd app github ./phpmd.xml",
+        "phpstan": "vendor/bin/phpstan analyse --memory-limit=512M",
+        "reset-db": "php artisan migrate:fresh",
+        "reset-test-db": "DB_DATABASE=testing php artisan db:wipe && DB_DATABASE=testing php artisan migrate",
+        "test": "php artisan test --compact --coverage --min=100",
+        "dev-test": "php artisan test --stop-on-failure --stop-on-error"
+    },
+    "extra": {
+        "laravel": {
+            "dont-discover": []
+        }
+    },
+    "config": {
+        "platform": {
+            "php": "8.3.0"
+        },
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "pestphp/pest-plugin": true,
+            "php-http/discovery": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

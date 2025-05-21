@@ -1,0 +1,216 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Http\\\\Request\\:\\:\\$password\\.$#"
+			count: 3
+			path: app/Actions/Fortify/RedirectToTwoFactorAuthentication.php
+
+		-
+			message: "#^Call to an undefined method Illuminate\\\\Contracts\\\\Auth\\\\StatefulGuard\\:\\:getProvider\\(\\)\\.$#"
+			count: 3
+			path: app/Actions/Fortify/RedirectToTwoFactorAuthentication.php
+
+		-
+			message: "#^Call to an undefined static method App\\\\Models\\\\User\\:\\:updateOrCreate\\(\\)\\.$#"
+			count: 1
+			path: app/Console/Commands/UserAdminCreate.php
+
+		-
+			message: "#^Call to an undefined method Illuminate\\\\Contracts\\\\Auth\\\\Guard\\:\\:logout\\(\\)\\.$#"
+			count: 1
+			path: app/Http/Controllers/Auth/AuthenticatedSessionController.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Http\\\\Request\\:\\:\\$password\\.$#"
+			count: 1
+			path: app/Http/Controllers/Auth/ConfirmablePasswordController.php
+
+		-
+			message: "#^Method App\\\\Http\\\\Controllers\\\\Auth\\\\ConfirmablePasswordController\\:\\:show\\(\\) should return Illuminate\\\\View\\\\View but returns Illuminate\\\\Contracts\\\\View\\\\View\\.$#"
+			count: 1
+			path: app/Http/Controllers/Auth/ConfirmablePasswordController.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Http\\\\Request\\:\\:\\$token\\.$#"
+			count: 1
+			path: app/Http/Controllers/Auth/NewPasswordController.php
+
+		-
+			message: "#^Method App\\\\Http\\\\Controllers\\\\Auth\\\\NewPasswordController\\:\\:create\\(\\) should return Illuminate\\\\View\\\\View but returns Illuminate\\\\Contracts\\\\View\\\\View\\.$#"
+			count: 1
+			path: app/Http/Controllers/Auth/NewPasswordController.php
+
+		-
+			message: "#^Method App\\\\Http\\\\Controllers\\\\Auth\\\\PasswordResetLinkController\\:\\:create\\(\\) should return Illuminate\\\\View\\\\View but returns Illuminate\\\\Contracts\\\\View\\\\View\\.$#"
+			count: 1
+			path: app/Http/Controllers/Auth/PasswordResetLinkController.php
+
+		-
+			message: "#^Method App\\\\Http\\\\Controllers\\\\Auth\\\\PasswordResetLinkController\\:\\:store\\(\\) has Illuminate\\\\Validation\\\\ValidationException in PHPDoc @throws tag but it's not thrown\\.$#"
+			count: 1
+			path: app/Http/Controllers/Auth/PasswordResetLinkController.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Http\\\\Requests\\\\UserRegisterRequest\\:\\:\\$token\\.$#"
+			count: 1
+			path: app/Http/Controllers/Auth/RegisteredUserController.php
+
+		-
+			message: "#^Call to an undefined method App\\\\Models\\\\User\\|Illuminate\\\\Database\\\\Eloquent\\\\Builder\\<App\\\\Models\\\\User\\>\\:\\:first\\(\\)\\.$#"
+			count: 1
+			path: app/Http/Controllers/Auth/RegisteredUserController.php
+
+		-
+			message: "#^Call to an undefined method App\\\\Models\\\\User\\|Illuminate\\\\Database\\\\Eloquent\\\\Builder\\<App\\\\Models\\\\User\\>\\:\\:firstOrFail\\(\\)\\.$#"
+			count: 1
+			path: app/Http/Controllers/Auth/RegisteredUserController.php
+
+		-
+			message: "#^Method App\\\\Http\\\\Controllers\\\\Auth\\\\RegisteredUserController\\:\\:create\\(\\) should return Illuminate\\\\View\\\\View but returns Illuminate\\\\Contracts\\\\View\\\\View\\.$#"
+			count: 1
+			path: app/Http/Controllers/Auth/RegisteredUserController.php
+
+		-
+			message: "#^Method App\\\\Http\\\\Controllers\\\\UserController\\:\\:create\\(\\) has Illuminate\\\\Auth\\\\Access\\\\AuthorizationException in PHPDoc @throws tag but it's not thrown\\.$#"
+			count: 1
+			path: app/Http/Controllers/UserController.php
+
+		-
+			message: "#^Method App\\\\Http\\\\Controllers\\\\UserController\\:\\:delete\\(\\) has Illuminate\\\\Auth\\\\Access\\\\AuthorizationException in PHPDoc @throws tag but it's not thrown\\.$#"
+			count: 1
+			path: app/Http/Controllers/UserController.php
+
+		-
+			message: "#^Method App\\\\Http\\\\Controllers\\\\UserController\\:\\:doReset\\(\\) has Illuminate\\\\Auth\\\\Access\\\\AuthorizationException in PHPDoc @throws tag but it's not thrown\\.$#"
+			count: 1
+			path: app/Http/Controllers/UserController.php
+
+		-
+			message: "#^Method App\\\\Http\\\\Controllers\\\\UserController\\:\\:edit\\(\\) has Illuminate\\\\Auth\\\\Access\\\\AuthorizationException in PHPDoc @throws tag but it's not thrown\\.$#"
+			count: 1
+			path: app/Http/Controllers/UserController.php
+
+		-
+			message: "#^Method App\\\\Http\\\\Controllers\\\\UserController\\:\\:index\\(\\) has Illuminate\\\\Auth\\\\Access\\\\AuthorizationException in PHPDoc @throws tag but it's not thrown\\.$#"
+			count: 1
+			path: app/Http/Controllers/UserController.php
+
+		-
+			message: "#^Method App\\\\Http\\\\Controllers\\\\UserController\\:\\:remove\\(\\) has Illuminate\\\\Auth\\\\Access\\\\AuthorizationException in PHPDoc @throws tag but it's not thrown\\.$#"
+			count: 1
+			path: app/Http/Controllers/UserController.php
+
+		-
+			message: "#^Method App\\\\Http\\\\Controllers\\\\UserController\\:\\:reset\\(\\) has Illuminate\\\\Auth\\\\Access\\\\AuthorizationException in PHPDoc @throws tag but it's not thrown\\.$#"
+			count: 1
+			path: app/Http/Controllers/UserController.php
+
+		-
+			message: "#^PHPDoc tag @mixin contains unknown class Eloquent\\.$#"
+			count: 1
+			path: app/Models/Client.php
+
+		-
+			message: "#^PHPDoc tag @mixin contains unknown class Eloquent\\.$#"
+			count: 1
+			path: app/Models/Organisation.php
+
+		-
+			message: "#^PHPDoc tag @mixin contains unknown class Eloquent\\.$#"
+			count: 1
+			path: app/Models/RegistrationRequest.php
+
+		-
+			message: "#^PHPDoc tag @mixin contains unknown class Eloquent\\.$#"
+			count: 1
+			path: app/Models/Role.php
+
+		-
+			message: "#^PHPDoc tag @mixin contains unknown class Eloquent\\.$#"
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: "#^PHPDoc tag @mixin contains unknown class Eloquent\\.$#"
+			count: 1
+			path: app/Models/UserRole.php
+
+		-
+			message: "#^Parameter \\#1 \\$greeting of method Illuminate\\\\Notifications\\\\Messages\\\\SimpleMessage\\:\\:greeting\\(\\) expects string, array\\|string given\\.$#"
+			count: 1
+			path: app/Notifications/Auth/UserPasswordReset.php
+
+		-
+			message: "#^Parameter \\#1 \\$subject of method Illuminate\\\\Notifications\\\\Messages\\\\SimpleMessage\\:\\:subject\\(\\) expects string, array\\|string given\\.$#"
+			count: 1
+			path: app/Notifications/Auth/UserPasswordReset.php
+
+		-
+			message: "#^Parameter \\#1 \\$text of method Illuminate\\\\Notifications\\\\Messages\\\\SimpleMessage\\:\\:action\\(\\) expects string, array\\|string given\\.$#"
+			count: 1
+			path: app/Notifications/Auth/UserPasswordReset.php
+
+		-
+			message: "#^Parameter \\#1 \\$greeting of method Illuminate\\\\Notifications\\\\Messages\\\\SimpleMessage\\:\\:greeting\\(\\) expects string, array\\|string given\\.$#"
+			count: 1
+			path: app/Notifications/Auth/UserRegistered.php
+
+		-
+			message: "#^Parameter \\#1 \\$subject of method Illuminate\\\\Notifications\\\\Messages\\\\SimpleMessage\\:\\:subject\\(\\) expects string, array\\|string given\\.$#"
+			count: 1
+			path: app/Notifications/Auth/UserRegistered.php
+
+		-
+			message: "#^Parameter \\#1 \\$text of method Illuminate\\\\Notifications\\\\Messages\\\\SimpleMessage\\:\\:action\\(\\) expects string, array\\|string given\\.$#"
+			count: 1
+			path: app/Notifications/Auth/UserRegistered.php
+
+		-
+			message: "#^Parameter \\#1 \\$greeting of method Illuminate\\\\Notifications\\\\Messages\\\\SimpleMessage\\:\\:greeting\\(\\) expects string, array\\|string given\\.$#"
+			count: 1
+			path: app/Notifications/Auth/UserReset.php
+
+		-
+			message: "#^Parameter \\#1 \\$subject of method Illuminate\\\\Notifications\\\\Messages\\\\SimpleMessage\\:\\:subject\\(\\) expects string, array\\|string given\\.$#"
+			count: 1
+			path: app/Notifications/Auth/UserReset.php
+
+		-
+			message: "#^Parameter \\#1 \\$text of method Illuminate\\\\Notifications\\\\Messages\\\\SimpleMessage\\:\\:action\\(\\) expects string, array\\|string given\\.$#"
+			count: 1
+			path: app/Notifications/Auth/UserReset.php
+
+		-
+			message: "#^Method App\\\\Services\\\\UserService\\:\\:updateUser\\(\\) throws checked exception TypeError but it's missing from the PHPDoc @throws tag\\.$#"
+			count: 1
+			path: app/Services/UserService.php
+
+		-
+			message: "#^Method App\\\\Services\\\\UserService\\:\\:updateUser\\(\\) throws checked exception ValueError but it's missing from the PHPDoc @throws tag\\.$#"
+			count: 1
+			path: app/Services/UserService.php
+
+		-
+			message: "#^Method App\\\\View\\\\Components\\\\AppLayout\\:\\:render\\(\\) should return Illuminate\\\\View\\\\View but returns Illuminate\\\\Contracts\\\\View\\\\View\\.$#"
+			count: 1
+			path: app/View/Components/AppLayout.php
+
+		-
+			message: "#^Method App\\\\View\\\\Components\\\\Flash\\:\\:getAriaLabel\\(\\) should return string but returns array\\|string\\.$#"
+			count: 1
+			path: app/View/Components/Flash.php
+
+		-
+			message: "#^Method App\\\\View\\\\Components\\\\Flash\\:\\:getHeader\\(\\) should return string but returns array\\|string\\.$#"
+			count: 1
+			path: app/View/Components/Flash.php
+
+		-
+			message: "#^Method App\\\\View\\\\Components\\\\GuestLayout\\:\\:render\\(\\) should return Illuminate\\\\View\\\\View but returns Illuminate\\\\Contracts\\\\View\\\\View\\.$#"
+			count: 1
+			path: app/View/Components/GuestLayout.php
+
+		-
+			message: "#^Variable \\$level might not be defined\\.$#"
+			count: 1
+			path: resources/views/vendor/notifications/email.blade.php

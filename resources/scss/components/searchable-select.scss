@@ -1,0 +1,94 @@
+.searchable-select {
+    position: relative;
+    width: 100%;
+}
+
+.searchable-select-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.searchable-select-input {
+    width: 100%;
+    padding: 0.5rem;
+    padding-right: 2.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: white;
+}
+
+.searchable-select-indicator {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    text-align: right;
+}
+
+.searchable-select-chevron {
+    width: 1.5rem;
+    height: 1.5rem;
+    color: #6b7280;
+    transition: transform 0.2s ease;
+}
+
+.searchable-select-chevron.open {
+    transform: rotate(180deg);
+}
+
+.searchable-select-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    max-height: 300px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 1000;
+    margin-top: 0.25rem;
+    overflow: hidden; /* Ensure the dropdown doesn't overflow */
+}
+
+.searchable-select-search {
+    padding: 0.5rem;
+    border-bottom: 1px solid #eee;
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 10;
+}
+
+.searchable-select-search-input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.searchable-select-options {
+    max-height: 250px;
+    overflow-y: auto;
+    width: 100%; /* Ensure the options container matches the dropdown width */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+.searchable-select-option {
+    padding: 0.5rem;
+    cursor: pointer;
+    outline: none;
+}
+
+.searchable-select-option:focus,
+.searchable-select-option:hover,
+.searchable-select-option.selected {
+    background-color: #f5f5f5;
+}

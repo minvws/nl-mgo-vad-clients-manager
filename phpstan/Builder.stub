@@ -1,0 +1,16 @@
+<?php
+
+namespace Illuminate\Database\Eloquent;
+
+class Builder
+{
+    /**
+     * Call the given local model scopes.
+     *
+     * @param array<int|string, mixed>|string $scopes
+     * @return static
+     */
+    public function scopes($scopes)
+    {
+    }
+}

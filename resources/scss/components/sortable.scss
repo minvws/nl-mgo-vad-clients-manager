@@ -1,0 +1,25 @@
+.sortable {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    outline: none;
+    font-weight: var(--table-head-cell-font-weight);
+    text-decoration: none;
+    color: var(--sortable-column-color, inherit);
+    transition: color 0.2s ease;
+}
+
+.sortable:hover {
+    font-weight: var(--table-head-cell-font-weight);
+    color: var(--sortable-column-hover-color, #007bff);
+    text-decoration: underline;
+}
+
+.sortable:focus {
+    outline: none;
+    box-shadow: none;
+}
+.sortable span{
+    margin-right: 0.5em;
+}

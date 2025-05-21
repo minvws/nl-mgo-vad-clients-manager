@@ -1,0 +1,17 @@
+/* Avatar */
+
+.avatar {
+  font-weight: 700;
+
+  &:hover {
+    border-radius: 50%;
+    background-color: #1864ab;
+  }
+
+  &:focus-visible {
+    border-radius: 50%;
+    background-color: #1864ab;
+    outline: 2px solid var(--oc-white);
+    outline-offset: -2px;
+  }
+}
