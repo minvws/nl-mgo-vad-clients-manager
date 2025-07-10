@@ -7,11 +7,12 @@ namespace App\Http\Controllers\Auth;
 use App\Components\FlashNotification;
 use App\Enums\FlashNotificationTypeEnum;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\User\StorePasswordResetLinkRequest;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use TypeError;
 
 use function redirect;
 use function route;
@@ -31,16 +32,12 @@ class PasswordResetLinkController extends Controller
      * Handle an incoming password reset link request.
      *
      * @throws ValidationException
+     * @throws TypeError
      */
-    public function store(Request $request): RedirectResponse
+    public function store(StorePasswordResetLinkRequest $request): RedirectResponse
     {
-        $request->validate([
-            'email' => ['required', 'email'],
-        ]);
-
-        Password::sendResetLink(
-            $request->only('email'),
-        );
+        $dto = $request->getValidatedDto();
+        Password::sendResetLink(['email' => $dto->email]);
 
         return redirect(route('login'))
             ->with(FlashNotification::SESSION_KEY, new FlashNotification(

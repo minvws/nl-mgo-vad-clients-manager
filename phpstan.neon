@@ -22,3 +22,11 @@ parameters:
             - 'LogicException'
             - 'RuntimeException'
     editorUrl: 'phpstorm://open?file=%%file%%&line=%%line%%'
+
+    ignoreErrors:
+        -
+            message: '#Class App\\Http\\Dtos\\.+ has an uninitialized readonly property \$\w+. Assign it in the constructor.#'
+            identifier: property.uninitializedReadonly
+            paths:
+                - app/Http/Dtos/*
+

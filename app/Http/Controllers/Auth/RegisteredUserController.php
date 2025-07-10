@@ -8,9 +8,10 @@ use App\Components\FlashNotification;
 use App\Enums\FlashNotificationTypeEnum;
 use App\Events\Logging\UserRegisteredEvent;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\UserRegisterRequest;
+use App\Http\Requests\User\RegisterRequest;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,9 +19,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\ValidationException;
-use Illuminate\View\View;
 use Laravel\Fortify\Contracts\TwoFactorAuthenticationProvider;
 use MinVWS\Logging\Laravel\LogService;
+use TypeError;
 
 use function abort_unless;
 use function assert;
@@ -56,10 +57,12 @@ class RegisteredUserController extends Controller
      * Handle an incoming registration request.
      *
      * @throws ValidationException
+     * @throws TypeError
      */
-    public function store(UserRegisterRequest $request): RedirectResponse
+    public function store(RegisterRequest $request): RedirectResponse
     {
-        $token = $request->session()->pull('registration_token') ?? $request->token;
+        $dto = $request->getValidatedDto();
+        $token = $request->session()->pull('registration_token') ?? $dto->token;
         assert(is_string($token));
 
         /** @var User $user */
@@ -79,7 +82,7 @@ class RegisteredUserController extends Controller
             ]);
         }
 
-        $code = $request->two_factor_code;
+        $code = $dto->two_factor_code;
         $secret = decrypt($user->two_factor_secret);
         assert(is_string($secret));
 
@@ -95,8 +98,8 @@ class RegisteredUserController extends Controller
         }
 
         $user->update([
-            'name' => $request->name,
-            'password' => Hash::make($request->password),
+            'name' => $dto->name,
+            'password' => Hash::make($dto->password),
             'two_factor_confirmed_at' => now(),
         ]);
 

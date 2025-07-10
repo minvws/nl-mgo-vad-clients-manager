@@ -6,7 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Components\FlashNotification;
 use App\Enums\FlashNotificationTypeEnum;
-use App\Http\Requests\ProfileUpdateRequest;
+use App\Http\Requests\Profile\UpdateRequest;
 use App\Support\Auth;
 use App\Support\I18n;
 use App\Support\SessionHelper;
@@ -15,6 +15,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Session;
+use TypeError;
 
 use function view;
 
@@ -32,10 +33,18 @@ class ProfileController extends Controller
         ]);
     }
 
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    /**
+     * @throws TypeError
+     */
+    public function update(UpdateRequest $request): RedirectResponse
     {
         $user = Auth::user();
-        $user->update($request->getValidatedAttributes());
+        $dto = $request->getValidatedDto();
+
+        $user->update([
+            'name' => $dto->name,
+            'email' => $dto->email,
+        ]);
 
         Session::regenerate();
         $this->sessionHelper->invalidateUser($user->id);

@@ -35,9 +35,7 @@ class PasswordResetTest extends TestCase
     public function testResetPasswordLinkCanBeRequested(): void
     {
         Notification::fake();
-
         $user = User::factory()->create();
-
         $this->post('/forgot-password', ['email' => $user->email]);
 
         Notification::assertSentTo(
@@ -60,7 +58,9 @@ class PasswordResetTest extends TestCase
     {
         Notification::fake();
 
-        $user = User::factory()->create();
+        $user = User::factory()->create([
+            'active' => true,
+        ]);
 
         $this->post('/forgot-password', ['email' => $user->email]);
 
@@ -72,7 +72,6 @@ class PasswordResetTest extends TestCase
             );
 
             $response = $this->get($resetUrl);
-
             $response->assertStatus(200);
 
             return true;
@@ -82,9 +81,7 @@ class PasswordResetTest extends TestCase
     public function testPasswordCanBeResetWithValidToken(): void
     {
         Notification::fake();
-
         $user = User::factory()->create();
-
         $this->post('/forgot-password', ['email' => $user->email]);
 
         Notification::assertSentTo($user, UserPasswordReset::class, function ($notification) use ($user) {
@@ -112,9 +109,7 @@ class PasswordResetTest extends TestCase
     public function testPasswordValidatePasswordRules(): void
     {
         Notification::fake();
-
         $user = User::factory()->create();
-
         $this->post('/forgot-password', ['email' => $user->email]);
 
         Notification::assertSentTo($user, UserPasswordReset::class, function ($notification) use ($user) {
@@ -145,9 +140,7 @@ class PasswordResetTest extends TestCase
     public function testPasswordValidatePasswordsShouldMatch(): void
     {
         Notification::fake();
-
         $user = User::factory()->create();
-
         $this->post('/forgot-password', ['email' => $user->email]);
 
         Notification::assertSentTo($user, UserPasswordReset::class, function ($notification) use ($user) {
@@ -178,9 +171,7 @@ class PasswordResetTest extends TestCase
     public function testPasswordValidateNewTwoFACode(): void
     {
         Notification::fake();
-
         $user = User::factory()->create();
-
         $this->post('/forgot-password', ['email' => $user->email]);
 
         Notification::assertSentTo($user, UserPasswordReset::class, function ($notification) use ($user) {

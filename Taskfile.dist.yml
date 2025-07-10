@@ -6,11 +6,12 @@ tasks:
     deps: [env:check]
     cmds:
       - |
+        mkdir -p "$HOME/.config/composer"
+
         docker run -it --rm \
         -u "$(id -u):$(id -g)" \
         -v "$(pwd):/var/www/html" \
         -v "$HOME/.config/composer:/.composer" \
-        -v "$HOME/.composer/auth.json:/.composer/auth.json" \
         -w /var/www/html \
         laravelsail/php83-composer:latest \
         composer install --ignore-platform-reqs --no-scripts

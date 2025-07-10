@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Enums\Role;
-use App\Http\Requests\UserUpdateRequest;
+use App\Http\Requests\User\UpdateRequest;
 use App\Models\User;
 use App\Notifications\Auth\UserRegistered;
 use App\Notifications\Auth\UserReset;
@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Laravel\Fortify\Contracts\TwoFactorAuthenticationProvider;
+use TypeError;
 use Webmozart\Assert\Assert;
 
 use function config;
@@ -34,15 +35,16 @@ class UserService
     /**
      * @param array<int, Role> $roles
      */
-    public function createUser(string $name, string $email, array $roles = [Role::User]): User
+    public function createUser(string $name, string $email, array $roles = [Role::User], ?string $registrationToken = null): User
     {
-        $registrationToken = Str::random(32);
+        $registrationToken = $registrationToken ?? Str::random(32);
 
         $user = User::query()->create([
             'name' => $name,
             'email' => $email,
             "password" => Hash::make(Str::random(32)),
             'registration_token' => hash('sha256', $registrationToken),
+            'active' => true,
         ]);
 
         $secret = $this->twoFactorAuthenticationProvider->generateSecretKey();
@@ -62,13 +64,20 @@ class UserService
         return $user;
     }
 
-    public function updateUser(UserUpdateRequest $request, User $user): User
+    /**
+     * @throws TypeError
+     */
+    public function updateUser(UpdateRequest $request, User $user): User
     {
+        $dto = $request->getValidatedDto();
         $user->roles()->detach();
 
-        $user->update($request->getValidatedAttributes());
+        $user->update([
+            'name' => $dto->name,
+            'email' => $dto->email,
+        ]);
 
-        foreach ($request->roles as $role) {
+        foreach ($dto->roles as $role) {
             $user->attachRole(Role::from($role));
         }
 
@@ -122,8 +131,7 @@ class UserService
         string $resetToken,
         string $email,
         ?int $expirationTtl = null,
-    ): string
-    {
+    ): string {
         $expirationTtl = $expirationTtl ?? $this->getDefaultExpirationTtl();
         $expiration = now()->addMinutes($expirationTtl);
 

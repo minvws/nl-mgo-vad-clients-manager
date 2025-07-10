@@ -12,6 +12,7 @@ use App\Models\Organisation;
 use App\Support\I18n;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
+use TypeError;
 
 use function redirect;
 use function route;
@@ -30,9 +31,20 @@ class OrganisationController extends Controller
         return view('organisations.create');
     }
 
+    /**
+     * @throws TypeError
+     */
     public function store(CreateRequest $request): RedirectResponse
     {
-        Organisation::query()->create($request->getValidatedAttributes());
+        $dto = $request->getValidatedDto();
+
+        Organisation::query()->create([
+            'name' => $dto->name,
+            'main_contact_email' => $dto->main_contact_email,
+            'main_contact_name' => $dto->main_contact_name,
+            'coc_number' => $dto->coc_number,
+            'notes' => $dto->notes,
+        ]);
 
         return redirect(route('organisations.index'))->with(
             'flash_notification',
@@ -45,9 +57,19 @@ class OrganisationController extends Controller
         return view('organisations.edit')->with('organisation', $organisation);
     }
 
+    /**
+     * @throws TypeError
+     */
     public function update(UpdateRequest $request, Organisation $organisation): RedirectResponse
     {
-        $organisation->update($request->getValidatedAttributes());
+        $dto = $request->getValidatedDto();
+        $organisation->update([
+            'name' => $dto->name,
+            'main_contact_email' => $dto->main_contact_email,
+            'main_contact_name' => $dto->main_contact_name,
+            'coc_number' => $dto->coc_number,
+            'notes' => $dto->notes,
+        ]);
 
         return redirect(route('organisations.index'))->with(
             'flash_notification',

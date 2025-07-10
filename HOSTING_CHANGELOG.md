@@ -17,6 +17,10 @@ Bij een installatie op een nieuwe omgeving zullen de volgende stappen altijd uit
 
     ...
 
+### [0.3.0] 2025-05-16
+
+    - No additional actions needed
+
 ### [0.2.0] 2025-04-25
 
     - Bug fixes

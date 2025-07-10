@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Components\FlashNotification;
 use App\Enums\FlashNotificationTypeEnum;
 use App\Http\Requests\Client\CreateRequest;
+use App\Http\Requests\Client\IndexRequest;
 use App\Http\Requests\Client\UpdateRequest;
 use App\Models\Client;
 use App\Models\Organisation;
@@ -14,10 +15,9 @@ use App\Support\I18n;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use TypeError;
 
-use function is_string;
 use function redirect;
 use function route;
 use function view;
@@ -26,8 +26,12 @@ class ClientController extends Controller
 {
     public const int CLIENT_PAGINATION_SIZE = 25;
 
-    public function index(Request $request): View
+    /**
+     * @throws TypeError
+     */
+    public function index(IndexRequest $request): View
     {
+        $dto = $request->getValidatedDto();
         $queryBuilder = Client::query()
             ->select([
                 'clients.*',
@@ -36,16 +40,19 @@ class ClientController extends Controller
                 'organisations.main_contact_email',
             ])
             ->join('organisations', 'clients.organisation_id', '=', 'organisations.id')
-            ->orderBy($this->getRequestSort($request), $this->getRequestDirection($request));
+            ->orderBy($dto->sort, $dto->direction);
 
-        $searchQuery = $this->getRequestSearch($request);
-        if ($searchQuery !== '') {
+        if ($dto->search !== null) {
             $queryBuilder = $queryBuilder->where(
-                static fn (Builder $query) => $query->where('clients.id', 'ilike', '%' . $searchQuery . '%')
-                    ->orWhere('clients.fqdn', 'ilike', '%' . $searchQuery . '%')
-                    ->orWhereRelation('organisation', 'name', 'ilike', '%' . $searchQuery . '%')
-                    ->orWhereRelation('organisation', 'main_contact_email', 'ilike', '%' . $searchQuery . '%'),
+                static fn(Builder $query) => $query->where('clients.id', 'ilike', '%' . $dto->search . '%')
+                    ->orWhere('clients.fqdn', 'ilike', '%' . $dto->search . '%')
+                    ->orWhereRelation('organisation', 'name', 'ilike', '%' . $dto->search . '%')
+                    ->orWhereRelation('organisation', 'main_contact_email', 'ilike', '%' . $dto->search . '%'),
             );
+        }
+
+        if ($dto->active !== null) {
+            $queryBuilder->where('clients.active', $dto->active);
         }
 
         $paginator = $queryBuilder->paginate(self::CLIENT_PAGINATION_SIZE);
@@ -55,30 +62,10 @@ class ClientController extends Controller
 
         return view('clients.index')
             ->with('clients', $paginator)
-            ->with('search', $this->getRequestSearch($request))
-            ->with('sort', $this->getRequestSort($request))
-            ->with('direction', $this->getRequestDirection($request));
-    }
-
-    private function getRequestSort(Request $request): string
-    {
-        $sort = $request->query('sort');
-
-        return is_string($sort) ? $sort : 'clients.created_at';
-    }
-
-    private function getRequestDirection(Request $request): string
-    {
-        $direction = $request->query('direction');
-
-        return is_string($direction) ? $direction : 'desc';
-    }
-
-    private function getRequestSearch(Request $request): string
-    {
-        $search = $request->input('search');
-
-        return is_string($search) ? $search : '';
+            ->with('search', $dto->search)
+            ->with('sort', $dto->sort)
+            ->with('direction', $dto->direction)
+            ->with('active', $dto->active);
     }
 
     public function create(): View
@@ -88,9 +75,20 @@ class ClientController extends Controller
         return view('clients.create')->with('organisations', $organisations);
     }
 
+    /**
+     * @throws TypeError
+     */
     public function store(CreateRequest $request): RedirectResponse
     {
-        Client::query()->create($request->getValidatedAttributes());
+        $dto = $request->getValidatedDto();
+        Client::query()->create(
+            [
+                'organisation_id' => $dto->organisation_id,
+                'redirect_uris' => $dto->redirect_uris,
+                'fqdn' => $dto->fqdn,
+                'active' => $dto->active,
+            ],
+        );
 
         return redirect(route('clients.index'))->with(
             'flash_notification',
@@ -105,9 +103,18 @@ class ClientController extends Controller
             ->with('organisations', Organisation::query()->select(['id', 'name'])->orderBy('name', 'asc')->get());
     }
 
+    /**
+     * @throws TypeError
+     */
     public function update(UpdateRequest $request, Client $client): RedirectResponse
     {
-        $client->update($request->getValidatedAttributes());
+        $dto = $request->getValidatedDto();
+        $client->update([
+            'organisation_id' => $dto->organisation_id,
+            'redirect_uris' => $dto->redirect_uris,
+            'fqdn' => $dto->fqdn,
+            'active' => $dto->active,
+        ]);
 
         return redirect(route('clients.index'))
             ->with(

@@ -2,13 +2,14 @@
     'route',
     'sort',
     'direction',
-    'search',
+    'search' => '',
+    'active' => '',
     'sortField',
     'label'
 ])
 
 <th scope="col">
-    <a href="{{ route($route, ['sort' => $sortField, 'direction' => $sort === $sortField && $direction === 'asc' ? 'desc' : 'asc', 'search' => $search]) }}" class="sortable">
+    <a href="{{ $url }}" class="sortable {{ $sort === $sortField ? 'sorted-' . $direction : '' }}">
         <span>{{ $label }}</span>
         @if ($sort === $sortField && $direction === 'asc')
             <x-tabler-sort-ascending/>

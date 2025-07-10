@@ -5,11 +5,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="csp-nonce" content="{{ csp_nonce() }}">
 
     <title>{{ $appName }}</title>
 
-    <!-- Scripts -->
     @vite(['resources/scss/app.scss'])
+    @stack('styles')
 </head>
 
 <body>
@@ -30,6 +31,7 @@
     </main>
 
     <x-footer />
+    @stack('scripts')
 </body>
 
 </html>

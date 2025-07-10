@@ -1,7 +1,8 @@
 @props([
     'search' => '',
     'sort',
-    'direction'
+    'direction',
+    'active' => null
 ])
 
 <x-app-layout>
@@ -14,11 +15,19 @@
 
     <section>
         <div class="search-container">
-            <form method="GET" action="{{ route('clients.index') }}" class="search-form">
+            <form method="GET" action="{{ route('clients.index') }}" class="search-form" id="client-filter-form">
                 <div class="form-group">
                     <label for="search">{{ __('general.search') }}</label>
                     <input type="text" id="search" name="search" value="{{ $search ?? '' }}" placeholder="{{ __('client.search_placeholder') }}">
                     <button type="submit" class="button">{{ __('general.search') }}</button>
+                </div>
+                <div class="horizontal-view">
+                    <label for="active">{{ __('client.active') }}</label>
+                    <select name="active" id="active" class="form-control">
+                        <option value="">{{ __('client.active_filter.all') }}</option>
+                        <option value="1" {{ $active === true ? 'selected' : '' }}>{{ __('client.active_filter.active') }}</option>
+                        <option value="0" {{ $active === false ? 'selected' : '' }}>{{ __('client.active_filter.inactive') }}</option>
+                    </select>
                 </div>
             </form>
         </div>
@@ -33,6 +42,7 @@
                         :sort="$sort"
                         :direction="$direction"
                         :search="$search"
+                        :active="$active"
                         sortField="organisations.name"
                         :label="__('client.owner_organisation.name')"
                     />
@@ -41,6 +51,7 @@
                         :sort="$sort"
                         :direction="$direction"
                         :search="$search"
+                        :active="$active"
                         sortField="organisations.main_contact_email"
                         :label="__('client.owner_organisation.main_contact_email')"
                     />
@@ -49,7 +60,8 @@
                         :sort="$sort"
                         :direction="$direction"
                         :search="$search"
-                        sortField="fqdn"
+                        :active="$active"
+                        sortField="clients.fqdn"
                         :label="__('client.fqdn')"
                     />
                     <th scope="col">{{ __('client.redirect_uris') }}</th>
@@ -58,6 +70,7 @@
                         :sort="$sort"
                         :direction="$direction"
                         :search="$search"
+                        :active="$active"
                         sortField="clients.created_at"
                         :label="__('client.created_at_header')"
                     />
@@ -66,6 +79,7 @@
                         :sort="$sort"
                         :direction="$direction"
                         :search="$search"
+                        :active="$active"
                         sortField="clients.updated_at"
                         :label="__('client.updated_at_header')"
                     />
@@ -110,4 +124,12 @@
             {{ $clients->links() }}
         </div>
     </section>
+
+    @push('scripts')
+    <script nonce="{{ csp_nonce() }}">
+        document.getElementById('active').addEventListener('change', function() {
+            document.getElementById('client-filter-form').submit();
+        });
+    </script>
+    @endpush
 </x-app-layout>

@@ -8,6 +8,7 @@ use App\Http\Middleware\EnsureUserIsAuthorizedToUseApp;
 use App\Models\User;
 use App\Support\I18n;
 use Illuminate\Support\Facades\Route;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 use function now;
@@ -32,19 +33,19 @@ class EnsureUserIsAuthorizedToUseAppTest extends TestCase
                 [
                     'registered_at' => null,
                     'two_factor_confirmed_at' => now(),
-                ]],
+                ],
+            ],
             'noTwoFactor' => [
                 [
                     'registered_at' => now(),
                     'two_factor_confirmed_at' => null,
                     'registration_token' => null,
-                ]],
+                ],
+            ],
         ];
     }
 
-    /**
-     * @dataProvider unauthorizedUserProvider
-     */
+    #[DataProvider('unauthorizedUserProvider')]
     public function testUnauthorizedUser(array|null $userAttrs): void
     {
         if ($userAttrs !== null) {

@@ -175,6 +175,20 @@ return [
         'redirect_uris' => [
             'required' => 'Er moet minstens 1 Redirect URI zijn.'
         ],
+        'client_redirect_uris.*' => [
+            'string' => 'Elke redirect URI moet geldige zijn.',
+            'distinct' => 'Redirect URI\'s moeten uniek zijn.',
+            'required' => 'De Redirect URI mag niet leeg zijn.'
+        ],
+        'client_redirect_uris' => [
+            'required' => 'Er moet minstens 1 Redirect URI zijn.'
+        ],
+        'client_fqdn' => [
+            'required' => 'Het FQDN field is verplicht.',
+            'regex' => 'Het FQDN moet een geldig Fully Qualified Domain Name zijn.',
+            'unique' => 'FQDN is al in gebruik.'
+        ],
+
     ],
 
     /*
@@ -197,6 +211,10 @@ return [
         'coc_number' => 'KvK nummer',
         'notes' => 'opmerkingen',
         'organisation_id' => 'organisatie naam',
+        'organisation_name' => 'Organisatie naam',
+        'organisation_main_contact_name' => 'Naam contactpersoon',
+        'organisation_main_contact_email' => 'Email contactpersoon',
+        'organisation_coc_number' => 'KVK-nummer',
         'fqdn' => 'FQDN',
     ],
 ];

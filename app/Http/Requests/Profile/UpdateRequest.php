@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Profile;
 
+use App\Http\Dtos\Profile\UpdateRequestDto;
+use App\Http\Requests\TypedRequest;
 use App\Models\User;
 use App\Support\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Unique;
+use TypeError;
 
-class ProfileUpdateRequest extends FormRequest
+class UpdateRequest extends TypedRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         $user = Auth::userIfAuthenticated();
@@ -22,8 +22,6 @@ class ProfileUpdateRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
-     *
      * @return array<string, array<Rule|Unique|string>>
      */
     public function rules(): array
@@ -45,5 +43,13 @@ class ProfileUpdateRequest extends FormRequest
                 Rule::unique(User::class)->ignore($user->id),
             ],
         ];
+    }
+
+    /**
+     * @throws TypeError
+     */
+    public function getValidatedDto(): UpdateRequestDto
+    {
+        return new UpdateRequestDto($this->safe());
     }
 }

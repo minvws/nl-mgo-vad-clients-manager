@@ -11,6 +11,7 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\OrganisationController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RegistrationRequestController;
 use App\Http\Controllers\TwoFactorAuthenticationController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\EnsureUserIsAuthorizedToUseApp;
@@ -40,6 +41,16 @@ Route::middleware('guest')->group(static function (): void {
 
     Route::post('reset-password', [NewPasswordController::class, 'store'])
         ->name('password.store');
+
+    Route::get('aanvragen', [RegistrationRequestController::class, 'create'])
+        ->name('registration-requests.create');
+
+    Route::post('aanvragen', [RegistrationRequestController::class, 'store'])
+        ->name('registration-requests.store')
+        ->middleware('throttle:' . config('throttle.registration_requests'));
+
+    Route::get('aanvragen/bedankt', [RegistrationRequestController::class, 'thankYou'])
+        ->name('registration-requests.thank-you');
 });
 
 Route::middleware('auth')->group(static function (): void {

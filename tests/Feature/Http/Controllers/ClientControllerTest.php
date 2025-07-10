@@ -7,7 +7,10 @@ namespace Tests\Feature\Http\Controllers;
 use App\Http\Controllers\ClientController;
 use App\Models\Client;
 use App\Models\Organisation;
+use App\Models\User;
+use App\Support\I18n;
 use Carbon\Carbon;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 use function assert;
@@ -82,7 +85,7 @@ class ClientControllerTest extends TestCase
                 'https://host.test.com/callback',
             ],
             'active' => true,
-            'organisation_id' => $organisation->id,
+            'organisation_id' => (string) $organisation->id,
         ]);
 
         $response->assertStatus(302);
@@ -162,7 +165,7 @@ class ClientControllerTest extends TestCase
                 'https://host.test.com/callback',
             ],
             'active' => true,
-            'organisation_id' => $organisation->id,
+            'organisation_id' => (string) $organisation->id,
         ]);
 
         $response->assertStatus(302);
@@ -319,7 +322,11 @@ class ClientControllerTest extends TestCase
     {
         $this->login();
 
-        $expectedClient = Client::factory()->for(Organisation::factory())->create(['fqdn' => 'https://UPPERCASE.test.com']);
+        $expectedClient = Client::factory()->for(
+            Organisation::factory(),
+        )->create(
+            ['fqdn' => 'https://UPPERCASE.test.com'],
+        );
 
         $response = $this->get('/clients?search=uppercase');
         $response->assertStatus(200);
@@ -360,26 +367,27 @@ class ClientControllerTest extends TestCase
         ]);
     }
 
-    public function testIndexFallbackToDefaultSort(): void
+    public function testIndexRequestDoesNotAcceptArbitrarySortParameter(): void
     {
         $this->login();
-        $clientA = Client::factory()->create([
+        Client::factory()->create([
             'created_at' => Carbon::yesterday(),
         ]);
-        $clientB = Client::factory()->create([
+        Client::factory()->create([
             'created_at' => Carbon::now(),
         ]);
 
         $queryParams = [
-            'sort' => ['blaat'],
-            'direction' => ['asc'],
+            'sort' => fake()->word(),
+            'direction' => 'asc',
         ];
 
         $response = $this->get('/clients?' . http_build_query($queryParams));
-        $response->assertStatus(200);
-        $response->assertSeeInOrder([
-            $clientB->id,
-            $clientA->id,
+        $response->assertStatus(302);
+        $response->assertSessionHasErrors([
+            'sort' => I18n::trans('validation.in', [
+                'attribute' => 'sort',
+            ]),
         ]);
     }
 
@@ -393,14 +401,14 @@ class ClientControllerTest extends TestCase
             'fqdn' => 'https://bbb.test.com',
         ]);
 
-        $response = $this->get('/clients?sort=fqdn&direction=asc');
+        $response = $this->get('/clients?sort=clients.fqdn&direction=asc');
         $response->assertStatus(200);
         $response->assertSeeInOrder([
             $clientA->id,
             $clientB->id,
         ]);
 
-        $response = $this->get('/clients?sort=fqdn&direction=desc');
+        $response = $this->get('/clients?sort=clients.fqdn&direction=desc');
         $response->assertStatus(200);
         $response->assertSeeInOrder([
             $clientB->id,
@@ -472,5 +480,41 @@ class ClientControllerTest extends TestCase
             $clientA->id,
         ]);
         $response->assertDontSee($clientC->id);
+    }
+
+     #[dataProvider('activeStatusProvider')]
+    public function testClientIndexCanBeFilteredOnActiveStatus(mixed $active, int $expectedCount): void
+    {
+        $user = User::factory()->create();
+        $organisation = Organisation::factory()->create();
+
+        Client::factory()
+            ->count(2)
+            ->for($organisation)
+            ->create(['active' => true]);
+
+        Client::factory()
+            ->count(3)
+            ->for($organisation)
+            ->create(['active' => false]);
+
+        $response = $this->actingAs($user)
+            ->get(route('clients.index', ['active' => $active]));
+
+        $response->assertOk();
+        $response->assertViewHas('clients', function ($clients) use ($expectedCount) {
+            return $clients->count() === $expectedCount;
+        });
+    }
+
+    public static function activeStatusProvider(): array
+    {
+        return [
+            'active clients' => [true, 2],
+            'inactive clients' => [false, 3],
+            'both active and inactive clients with empty string' => ['', 5],
+            'both active and inactive clients with null value' => [null, 5],
+            'active clients with value 1' => [1, 2],
+        ];
     }
 }

@@ -2,36 +2,51 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\User;
 
 use App\Actions\Fortify\PasswordValidationRules;
 use App\Components\FlashNotification;
 use App\Enums\FlashNotificationTypeEnum;
+use App\Http\Dtos\User\RegisterRequestDto;
+use App\Http\Requests\TypedRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rules\Password;
+use TypeError;
 
-/**
- * @property string $name
- * @property string $password
- * @property string $two_factor_code
- */
-class UserRegisterRequest extends FormRequest
+class RegisterRequest extends TypedRequest
 {
     use PasswordValidationRules;
 
     /**
-     * Get the validation rules that apply to the request.
-     *
      * @return array<string, array<int, Password|string>>
      */
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
             'password' => $this->passwordRules(),
-            'two_factor_code' => ['required', 'string'],
+            'two_factor_code' => [
+                'required',
+                'string',
+            ],
+            'token' => [
+                'sometimes',
+                'string',
+            ],
         ];
+    }
+
+    /**
+     * @throws TypeError
+     */
+    public function getValidatedDto(): RegisterRequestDto
+    {
+        return new RegisterRequestDto($this->safe());
     }
 
     protected function failedValidation(Validator $validator): void

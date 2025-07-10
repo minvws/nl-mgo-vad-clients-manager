@@ -6,7 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Components\FlashNotification;
 use App\Enums\FlashNotificationTypeEnum;
-use App\Http\Requests\Profile2FAResetRequest;
+use App\Http\Requests\Profile\TwoFactorResetRequest;
 use App\Models\User;
 use App\Support\Auth;
 use App\Support\I18n;
@@ -15,6 +15,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Log\Logger;
 use Laravel\Fortify\Contracts\TwoFactorAuthenticationProvider;
+use TypeError;
 use Webmozart\Assert\Assert;
 
 use function decrypt;
@@ -50,10 +51,14 @@ class TwoFactorAuthenticationController extends Controller
         ]);
     }
 
-    public function update(Profile2FAResetRequest $request): RedirectResponse
+    /**
+     * @throws TypeError
+     */
+    public function update(TwoFactorResetRequest $request): RedirectResponse
     {
         $user = Auth::user();
-        $encryptedSecret = $request->input('encrypted_secret', '');
+        $dto = $request->getValidatedDto();
+        $encryptedSecret = $dto->encrypted_secret;
         Assert::stringNotEmpty($encryptedSecret);
 
         try {
@@ -74,7 +79,7 @@ class TwoFactorAuthenticationController extends Controller
                 ));
         }
 
-        if (!$this->twoFactorAuthenticationProvider->verify($decryptedSecret, $request->code)) {
+        if (!$this->twoFactorAuthenticationProvider->verify($decryptedSecret, $dto->code)) {
             return redirect()
                 ->route('profile.2fa.reset', ['encrypted_secret' => $encryptedSecret])
                 ->with(FlashNotification::SESSION_KEY, new FlashNotification(

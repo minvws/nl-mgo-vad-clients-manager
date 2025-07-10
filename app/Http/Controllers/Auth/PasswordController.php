@@ -12,17 +12,22 @@ use App\Support\Auth;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
+use TypeError;
 
 use function back;
 
 class PasswordController extends Controller
 {
+    /**
+     * @throws TypeError
+     */
     public function update(PasswordUpdateRequest $request): RedirectResponse
     {
         $user = Auth::user();
+        $dto = $request->getValidatedDto();
 
         $user->update([
-            'password' => Hash::make($request->password),
+            'password' => Hash::make($dto->password),
         ]);
 
         Session::regenerate();

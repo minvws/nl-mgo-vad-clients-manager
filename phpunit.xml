@@ -17,14 +17,6 @@
       <directory>./app</directory>
     </include>
   </source>
-  <coverage
-      pathCoverage="false"
-      ignoreDeprecatedCodeUnits="false"
-      disableCodeCoverageIgnore="false">
-    <report>
-      <clover outputFile="tests/cov.xml"/>
-    </report>
-  </coverage>
   <php>
     <env name="APP_ENV" value="testing"/>
     <env name="APP_KEY" value="base64:jpY6VQEN7ilkt0iJN1mNa8zPsi1DWEsZ9rX7lGaMOzM="/>
@@ -32,6 +24,7 @@
     <env name="BCRYPT_ROUNDS" value="4"/>
     <env name="CACHE_STORE" value="array"/>
     <env name="DB_DATABASE" value="testing"/>
+    <env name="LOG_CHANNEL" value="null"/>
     <env name="MAIL_MAILER" value="array"/>
     <env name="PULSE_ENABLED" value="false"/>
     <env name="QUEUE_CONNECTION" value="sync"/>

@@ -25,26 +25,36 @@ risk and that the authors assume no liability for any consequences of its use.
 
 - [Docker](https://docs.docker.com/get-started/get-docker/) and [Docker Compose](https://docs.docker.com/compose/).
 - [Task](https://taskfile.dev/#/installation).
-- [Composer](https://getcomposer.org/download/).
-  - depending on your OS you need to install `php` as well; `brew install composer` installs php & composer on MacOS.
-  - run `composer config -g` to initialise the global configuration
 
 ### Installation
 
-This repository uses private packages hosted on the minvws GitHub account. To access these packages, you need to authenticate
-using a GitHub Personal Access Token (PAT). This token should contain the scopes repo and read:packages and should be added
-to your local `auth.json` file. This file is typically located in your composer directory (e.g. ~/.config/composer/auth.json
-or ~/.composer/auth.json), but you can also just create an `auth.json` file in the project root. Just be sure to not commit that :) 
+#### 1. Generate and Configure GitHub Token
 
-Add the following content to the auth.json file, replacing your_github_token_here with the token you generated:
+This repository depends on private packages hosted on the MinVWS GitHub account.
+To access these packages, you must authenticate using a GitHub Personal Access Token (PAT).
+
+The token must have the following scopes:
+
+- `repo`
+- `read:packages`
+
+Once you have generated your token, store it in an `auth.json` file.
+The recommended location for this file is:
+`~/.config/composer/auth.json` (Composer's global configuration directory)
+Alternatively, you may place the `auth.json` file in the root of the project.
+
+Example: **auth.json**:
 
 ```json
+
 {
     "github-oauth": {
         "github.com": "your_github_token_here"
     }
 }
 ```
+
+#### 2. Clone and Initialize the Project
 
 Clone this repository and run in the root of your project:
 
@@ -63,6 +73,8 @@ This will do the following:
 - Create an admin user
 Note: In the output there will be a link present to finish the registration of the admin user before you can login
 
+#### 3. Start the Application
+
 The next time, if you want to simply start the application without initialization, run the following command:
 
 ```bash
@@ -72,6 +84,8 @@ task up
 So what the `task init` does is to prepare your environment from scratch, so it does all kind of installations, prepopulates the database,
 creates an admin user and has also the container `nl-mgo-vad-clients-manager` up and running.
 In case you don't have any radical updates to run and you simply want to run the application, then you 'd better use the `task up` command.
+
+#### 4. Stopping the Application
 
 To stop the containers you can run the following command:
 

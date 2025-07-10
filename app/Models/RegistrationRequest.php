@@ -56,4 +56,10 @@ class RegistrationRequest extends Model
         'client_fqdn',
         'notes',
     ];
+
+    /** @var array<string, string> */
+    protected $casts = [ //phpcs:ignore 
+        'client_redirect_uris' => 'json',
+        'organisation_coc_number' => 'string',
+    ];
 }

@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Client;
 
-use App\Http\Requests\FormRequest;
+use App\Http\Dtos\Client\CreateRequestDto;
+use App\Http\Requests\TypedRequest;
 use App\Rules\FQDNMatchRule;
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Unique;
+use TypeError;
 
-class CreateRequest extends FormRequest
+class CreateRequest extends TypedRequest
 {
     // This regex (FQDN_REG_EX) validates a Fully Qualified Domain Name (FQDN) with the following rules:
     // 1. `(?=^.{4,253}$)` - Positive lookahead to ensure the entire FQDN is between 4 and 253 characters long.
@@ -23,20 +24,42 @@ class CreateRequest extends FormRequest
     public const string FQDN_REG_EX = '/(?=^.{4,253}$)(^((?!-)[a-zA-Z0-9-]{1,63}(?<!-)\.)+[a-zA-Z]{2,63}$)/';
 
     /**
-     * @return array<string, string|array<int, string|Unique|ValidationRule>>
+     * @return array<string, string|array<int, string|Unique|FQDNMatchRule>>
      */
     public function rules(): array
     {
         return [
-            'organisation_id' => 'required',
+            'organisation_id' => [
+                'required',
+            ],
+            'redirect_uris' => [
+                'required',
+                'array',
+                'min:1',
+            ],
+            'redirect_uris.*' => [
+                'required',
+                'string',
+                'distinct:strict',
+                new FQDNMatchRule(),
+            ],
             'fqdn' => [
                 'required',
                 Rule::unique('clients', 'fqdn'),
                 'regex:' . self::FQDN_REG_EX,
             ],
-            'redirect_uris' => 'required|array|min:1',
-            'redirect_uris.*' => ['required', 'string', 'distinct:strict', new FQDNMatchRule()],
-            'active' => 'required|boolean',
+            'active' => [
+                'required',
+                'boolean',
+            ],
         ];
+    }
+
+    /**
+     * @throws TypeError
+     */
+    public function getValidatedDto(): CreateRequestDto
+    {
+        return new CreateRequestDto($this->safe());
     }
 }

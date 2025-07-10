@@ -11,11 +11,6 @@ parameters:
 			path: app/Actions/Fortify/RedirectToTwoFactorAuthentication.php
 
 		-
-			message: "#^Call to an undefined static method App\\\\Models\\\\User\\:\\:updateOrCreate\\(\\)\\.$#"
-			count: 1
-			path: app/Console/Commands/UserAdminCreate.php
-
-		-
 			message: "#^Call to an undefined method Illuminate\\\\Contracts\\\\Auth\\\\Guard\\:\\:logout\\(\\)\\.$#"
 			count: 1
 			path: app/Http/Controllers/Auth/AuthenticatedSessionController.php
@@ -29,11 +24,6 @@ parameters:
 			message: "#^Method App\\\\Http\\\\Controllers\\\\Auth\\\\ConfirmablePasswordController\\:\\:show\\(\\) should return Illuminate\\\\View\\\\View but returns Illuminate\\\\Contracts\\\\View\\\\View\\.$#"
 			count: 1
 			path: app/Http/Controllers/Auth/ConfirmablePasswordController.php
-
-		-
-			message: "#^Access to an undefined property Illuminate\\\\Http\\\\Request\\:\\:\\$token\\.$#"
-			count: 1
-			path: app/Http/Controllers/Auth/NewPasswordController.php
 
 		-
 			message: "#^Method App\\\\Http\\\\Controllers\\\\Auth\\\\NewPasswordController\\:\\:create\\(\\) should return Illuminate\\\\View\\\\View but returns Illuminate\\\\Contracts\\\\View\\\\View\\.$#"
@@ -51,11 +41,6 @@ parameters:
 			path: app/Http/Controllers/Auth/PasswordResetLinkController.php
 
 		-
-			message: "#^Access to an undefined property App\\\\Http\\\\Requests\\\\UserRegisterRequest\\:\\:\\$token\\.$#"
-			count: 1
-			path: app/Http/Controllers/Auth/RegisteredUserController.php
-
-		-
 			message: "#^Call to an undefined method App\\\\Models\\\\User\\|Illuminate\\\\Database\\\\Eloquent\\\\Builder\\<App\\\\Models\\\\User\\>\\:\\:first\\(\\)\\.$#"
 			count: 1
 			path: app/Http/Controllers/Auth/RegisteredUserController.php
@@ -66,9 +51,9 @@ parameters:
 			path: app/Http/Controllers/Auth/RegisteredUserController.php
 
 		-
-			message: "#^Method App\\\\Http\\\\Controllers\\\\Auth\\\\RegisteredUserController\\:\\:create\\(\\) should return Illuminate\\\\View\\\\View but returns Illuminate\\\\Contracts\\\\View\\\\View\\.$#"
+			message: "#^Call to an undefined static method App\\\\Models\\\\RegistrationRequest\\:\\:create\\(\\)\\.$#"
 			count: 1
-			path: app/Http/Controllers/Auth/RegisteredUserController.php
+			path: app/Http/Controllers/RegistrationRequestController.php
 
 		-
 			message: "#^Method App\\\\Http\\\\Controllers\\\\UserController\\:\\:create\\(\\) has Illuminate\\\\Auth\\\\Access\\\\AuthorizationException in PHPDoc @throws tag but it's not thrown\\.$#"
@@ -179,11 +164,6 @@ parameters:
 			message: "#^Parameter \\#1 \\$text of method Illuminate\\\\Notifications\\\\Messages\\\\SimpleMessage\\:\\:action\\(\\) expects string, array\\|string given\\.$#"
 			count: 1
 			path: app/Notifications/Auth/UserReset.php
-
-		-
-			message: "#^Method App\\\\Services\\\\UserService\\:\\:updateUser\\(\\) throws checked exception TypeError but it's missing from the PHPDoc @throws tag\\.$#"
-			count: 1
-			path: app/Services/UserService.php
 
 		-
 			message: "#^Method App\\\\Services\\\\UserService\\:\\:updateUser\\(\\) throws checked exception ValueError but it's missing from the PHPDoc @throws tag\\.$#"

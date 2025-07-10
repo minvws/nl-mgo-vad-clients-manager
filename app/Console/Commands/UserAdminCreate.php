@@ -5,18 +5,15 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Enums\Role;
-use App\Models\User;
 use App\Notifications\Auth\UserRegistered;
 use App\Services\UserService;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Laravel\Fortify\Contracts\TwoFactorAuthenticationProvider;
+use Webmozart\Assert\Assert;
 
-use function encrypt;
-use function hash;
 use function sprintf;
 
 class UserAdminCreate extends Command implements PromptsForMissingInput
@@ -47,30 +44,20 @@ class UserAdminCreate extends Command implements PromptsForMissingInput
         UserService $userService,
     ): int
     {
-        DB::transaction(function () use ($authProvider, $userService): void {
+        DB::transaction(function () use ($userService): void {
             $registrationToken = Str::random(32);
 
-            $user = User::updateOrCreate(
-                [
-                    "email" => $this->argument('email'),
-                ],
-                [
-                    "name" => $this->argument('name'),
-                    "password" => Hash::make(Str::random(32)),
-                    'registration_token' => hash('sha256', $registrationToken),
-                    "active" => true,
-                ],
+            $name = $this->argument('name');
+            Assert::string($name);
+            $email = $this->argument('email');
+            Assert::string($email);
+
+            $user = $userService->createUser(
+                $name,
+                $email,
+                [Role::UserAdmin],
+                $registrationToken,
             );
-
-            // Add the admin role to the user
-            $user->attachRole(Role::UserAdmin);
-
-            $secret = $authProvider->generateSecretKey();
-
-            $user->forceFill([
-                'two_factor_secret' => encrypt($secret),
-            ]);
-            $user->save();
 
             $registerUrl = $userService->generateRegistrationUrl($registrationToken);
 

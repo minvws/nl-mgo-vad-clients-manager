@@ -11,9 +11,9 @@ use App\Events\Logging\CreateUserEvent;
 use App\Events\Logging\DeleteUserEvent;
 use App\Events\Logging\UpdateUserEvent;
 use App\Events\Logging\ViewUserEvent;
-use App\Http\Requests\UserCreateRequest;
-use App\Http\Requests\UserFilterRequest;
-use App\Http\Requests\UserUpdateRequest;
+use App\Http\Requests\User\CreateRequest;
+use App\Http\Requests\User\FilterRequest;
+use App\Http\Requests\User\UpdateRequest;
 use App\Models\User;
 use App\Services\UserService;
 use App\Support\Auth;
@@ -46,18 +46,19 @@ class UserController extends Controller
 
     /**
      * @throws AuthorizationException
+     * @throws TypeError
      */
-    public function index(UserFilterRequest $request): View
+    public function index(FilterRequest $request): View
     {
         Gate::authorize('index', User::class);
-
+        $dto = $request->getValidatedDto();
         $users = User::query()
-            ->scopes(['filterByNameOrEmail' => $request->getStringOrNull('filter')])
+            ->scopes(['filterByNameOrEmail' => $dto->filter])
             ->when(
-                value: $request->getStringOrNull('sort'),
+                value: $dto->sort,
                 callback: static fn(Builder $query) => $query->orderBy(
-                    column: $request->getString('sort'),
-                    direction: $request->getStringWithDefault('direction', 'asc'),
+                    column: $dto->sort,
+                    direction: $dto->direction,
                 ),
             )
             ->paginate();
@@ -86,17 +87,19 @@ class UserController extends Controller
      * @throws TypeError
      * @throws ValueError
      */
-    public function store(UserCreateRequest $request): RedirectResponse
+    public function store(CreateRequest $request): RedirectResponse
     {
-        $roles = $request->input('roles', []);
+        $dto = $request->getValidatedDto();
+        $roles = $dto->roles;
+
         Assert::isArray($roles);
         Assert::allString($roles);
 
         $user = $this->userService->createUser(
-            name: $request->getString('name'),
-            email: $request->getString('email'),
+            name: $dto->name,
+            email: $dto->email,
             roles: array_map(
-                static fn (mixed $role): Role => Role::from($role),
+                static fn(mixed $role): Role => Role::from($role),
                 $roles,
             ),
         );
@@ -134,7 +137,10 @@ class UserController extends Controller
         ]);
     }
 
-    public function update(UserUpdateRequest $request, User $user): RedirectResponse
+    /**
+     * @throws TypeError
+     */
+    public function update(UpdateRequest $request, User $user): RedirectResponse
     {
         $this->logger->log((new UpdateUserEvent())
             ->withActor(Auth::user())

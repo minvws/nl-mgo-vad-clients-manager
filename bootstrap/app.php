@@ -10,7 +10,7 @@ use Spatie\Csp\AddCspHeaders;
 use Webmozart\Assert\Assert;
 
 return Application::configure(basePath: dirname(__DIR__))
-    ->withRouting(web: __DIR__ . '/../routes/web.php', health: '/up')
+    ->withRouting(web: __DIR__ . '/../routes/web.php', api: __DIR__ . '/../routes/api.php', health: '/up')
     ->withMiddleware(static function (Middleware $middleware): void {
         $middleware->trustHosts(static function (): array {
             $trustedHosts = Config::array('app.trusted_hosts');

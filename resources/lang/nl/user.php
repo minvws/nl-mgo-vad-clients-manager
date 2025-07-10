@@ -36,6 +36,7 @@ return [
 
     'flash' => [
         'created' => 'Gebruiker is aangemaakt. Instructies voor het instellen van inloggegevens zijn per e-mail verstuurd.',
+        'created_error' => 'Gebruiker kan niet aangemaakt worden.',
         'register_error' => 'Registratie kan niet worden afgerond.',
         'updated' => 'Gebruiker is bijgewerkt',
         'update_error' => 'De gebruiker kan niet worden bijgewerkt.',

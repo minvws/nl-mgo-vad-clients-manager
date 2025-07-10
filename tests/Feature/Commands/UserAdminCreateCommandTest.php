@@ -18,27 +18,25 @@ class UserAdminCreateCommandTest extends TestCase
     #[Test]
     public function testSuccessfulCommand(): void
     {
-        $user = User::factory()->create();
-
-        $output = sprintf(
-            "User admin %s created. Please share the following URL to let the user make his registration complete:",
-            $user->email,
-        );
+        $email = $this->faker->email;
+        $name = $this->faker->name;
+        $output = sprintf("User admin %s created. Please share the following URL to let the user make his registration complete:", $email);
 
         $this->artisan('user:create-admin')
-            ->expectsQuestion('What is the email?', $user->email)
-            ->expectsQuestion('What is the name?', $user->name)
+            ->expectsQuestion('What is the email?', $email)
+            ->expectsQuestion('What is the name?', $name)
             ->expectsOutput($output)
             ->assertSuccessful();
 
-        $this->assertDatabaseHas('role_user', [
-            'user_id' => $user->id,
-            'role_name' => RoleEnum::UserAdmin,
+        $this->assertDatabaseHas(User::class, [
+            'name' => $name,
+            'email' => $email,
         ]);
 
-        $this->assertDatabaseHas(User::class, [
-            'id' => $user->id,
-            'email' => $user->email,
+        $userId = User::where('email', $email)->firstOrFail()->id;
+        $this->assertDatabaseHas('role_user', [
+            'user_id' => $userId,
+            'role_name' => RoleEnum::UserAdmin,
         ]);
     }
 
@@ -46,21 +44,23 @@ class UserAdminCreateCommandTest extends TestCase
     public function testSuccessfulCommandWithMail(): void
     {
         Notification::fake();
-        $user = User::factory()->create();
+        $email = $this->faker->email;
+        $name = $this->faker->name;
 
         $this->artisan('user:create-admin --sendMail')
-            ->expectsQuestion('What is the email?', $user->email)
-            ->expectsQuestion('What is the name?', $user->name)
+            ->expectsQuestion('What is the email?', $email)
+            ->expectsQuestion('What is the name?', $name)
             ->assertSuccessful();
 
+        $this->assertDatabaseHas(User::class, [
+            'name' => $name,
+            'email' => $email,
+        ]);
+
+        $user = User::where('email', $email)->firstOrFail();
         $this->assertDatabaseHas('role_user', [
             'user_id' => $user->id,
             'role_name' => RoleEnum::UserAdmin,
-        ]);
-
-        $this->assertDatabaseHas(User::class, [
-            'id' => $user->id,
-            'email' => $user->email,
         ]);
 
         Notification::assertSentTo($user, UserRegistered::class);

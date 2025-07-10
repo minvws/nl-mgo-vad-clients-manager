@@ -10,9 +10,12 @@ use function __;
 
 class I18n
 {
-    public static function trans(string $key): string
+    /**
+     * @param array<string, mixed> $attributes The attributes to replace in the translation string.
+     */
+    public static function trans(string $key, array $attributes = []): string
     {
-        $translation = __($key);
+        $translation = __($key, $attributes);
 
         Assert::string($translation);
 

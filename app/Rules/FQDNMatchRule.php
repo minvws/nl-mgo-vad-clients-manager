@@ -26,15 +26,28 @@ class FQDNMatchRule implements ValidationRule, DataAwareRule
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (!isset($this->data['fqdn']) || $value === null) {
+        $fqdn = $this->getFqdn();
+        if ($fqdn === null || $value === null) {
             return;
         }
 
-        Assert::string($this->data['fqdn']);
         $values = is_string($value) ? [$value] : $value;
         Assert::allString($values);
 
-        $this->validateRedirectUris($this->data['fqdn'], (array) $values, $fail);
+        $this->validateRedirectUris($fqdn, (array) $values, $fail);
+    }
+
+    private function getFqdn(): ?string
+    {
+        if (isset($this->data['fqdn'])) {
+            Assert::string($this->data['fqdn']);
+            return $this->data['fqdn'];
+        }
+        if (isset($this->data['client_fqdn'])) {
+            Assert::string($this->data['client_fqdn']);
+            return $this->data['client_fqdn'];
+        }
+        return null;
     }
 
     /**
