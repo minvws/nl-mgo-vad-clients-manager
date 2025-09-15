@@ -17,6 +17,7 @@ use PHPUnit\Framework\Attributes\TestWith;
 use Tests\TestCase;
 
 use function assert;
+use function fake;
 use function now;
 use function route;
 use function sprintf;
@@ -443,5 +444,29 @@ class UserControllerTest extends TestCase
         $adminUser->attachRole(Role::UserAdmin);
         $adminUser->markAsRegistered();
         return $adminUser;
+    }
+
+    public function testUserCanBeUpdatedWhenEmailExistsForDeletedUser(): void
+    {
+        $this->login();
+        $email = fake()->safeEmail();
+        User::factory()->create([
+            'email' => $email,
+            'deleted_at' => now(),
+        ]);
+
+        $user2 = User::factory()->create([
+            'email' => fake()->safeEmail(),
+            'deleted_at' => null,
+        ]);
+
+        $this
+            ->post(route('users.update', ['user' => $user2->id]), [
+                'name' => 'Updated User',
+                'email' => $email,
+                'roles' => [Role::User->value],
+            ])
+            ->assertRedirect(route('users.index'))
+            ->assertSessionDoesntHaveErrors();
     }
 }

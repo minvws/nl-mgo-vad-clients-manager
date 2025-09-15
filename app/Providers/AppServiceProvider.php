@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use App\Models\User;
 use App\Policies\UserPolicy;
+use App\Services\ClientChangeNotifier;
 use App\Support\ExceptionRenderer;
 use App\Support\Str\Initials;
 use Barryvdh\Debugbar\Facades\Debugbar;
@@ -19,6 +20,7 @@ use Illuminate\Foundation\Exceptions\Renderer\Renderer;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
@@ -106,15 +108,18 @@ class AppServiceProvider extends ServiceProvider
         }
         // @codeCoverageIgnoreEnd
 
-        if ($this->app->environment('local') !== true || config('app.skip_authentication') !== true) {
-            return;
+        if ($this->app->environment('local') === true && config('app.skip_authentication') === true) {
+            try {
+                $user = User::query()->firstOrFail();
+                Auth::loginUsingId($user->id);
+            } catch (Throwable) {
+                // This is just to make sure we don't crash the application if we can't find user 1 for some reason
+                Log::warning('Skipping authentication failed: no user found. Please create a user with ID 1.');
+            }
         }
 
-        try {
-            $user = User::query()->firstOrFail();
-            Auth::loginUsingId($user->id);
-        } catch (Throwable) {
-            // This is just to make sure we don't crash the application if we can't find user 1 for some reason
-        }
+        $this->app->when(ClientChangeNotifier::class)
+            ->needs('$notifiables')
+            ->giveConfig('services.vad.notifiables', []);
     }
 }

@@ -17,6 +17,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
+use Illuminate\Validation\Rules\Unique;
 use TypeError;
 use Webmozart\Assert\Assert;
 
@@ -33,7 +34,7 @@ class UpdateRequest extends TypedRequest
     }
 
     /**
-     * @return array<string, array<ValidationRule|Enum|string>>
+     * @return array<string, array<ValidationRule|Enum|Unique|string>>
      */
     public function rules(): array
     {
@@ -51,7 +52,7 @@ class UpdateRequest extends TypedRequest
                 'required',
                 'email:strict',
                 'max:255',
-                'unique:users,email,' . $user->id,
+                Rule::unique('users')->ignore($user)->withoutTrashed(),
             ],
             'roles' => [
                 'required',

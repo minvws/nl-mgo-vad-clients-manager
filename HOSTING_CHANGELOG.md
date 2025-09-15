@@ -15,7 +15,11 @@ Bij een installatie op een nieuwe omgeving zullen de volgende stappen altijd uit
 
 ### Next release
 
-    ...
+### [0.4.0]
+
+#### Added
+- VAD_NOTIFIABLES
+    - A CSV string of webhook URL's that should be notified when clients are updated
 
 ### [0.3.0] 2025-05-16
 

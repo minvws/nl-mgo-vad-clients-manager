@@ -10,7 +10,7 @@ use function config;
 use function gettype;
 use function sprintf;
 
-final class Config
+class Config
 {
     /**
      * @return array<int, mixed>

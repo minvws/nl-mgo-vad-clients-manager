@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Observers\ClientObserver;
 use Database\Factories\ClientFactory;
 use Eloquent;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -33,6 +35,8 @@ use Illuminate\Support\Carbon;
  * @property-read Organisation $organisation
  * @mixin Eloquent
  */
+
+#[ObservedBy([ClientObserver::class])]
 class Client extends Model
 {
     /** @use HasFactory<ClientFactory> */

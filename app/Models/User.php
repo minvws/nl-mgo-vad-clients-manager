@@ -92,6 +92,7 @@ class User extends Authenticatable implements LoggableUser
         'registered_at',
         'registration_token',
         'active',
+        'deleted_at',
     ];
 
     /**

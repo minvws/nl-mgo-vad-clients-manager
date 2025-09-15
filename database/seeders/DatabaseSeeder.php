@@ -31,6 +31,8 @@ class DatabaseSeeder extends Seeder
 
         $organisation = Organisation::factory()->createOne();
 
-        Client::factory()->for($organisation)->createOne();
+        Client::factory()
+            ->for($organisation)
+            ->createQuietly();
     }
 }

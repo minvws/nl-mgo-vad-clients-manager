@@ -37,4 +37,7 @@ return [
         ],
     ],
 
+    'vad' => [
+        'notifiables' => explode(',', env('VAD_NOTIFIABLES', '')), // @phpstan-ignore-line as string is the only possible type
+    ],
 ];

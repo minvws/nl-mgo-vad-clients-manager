@@ -42,14 +42,14 @@ Route::middleware('guest')->group(static function (): void {
     Route::post('reset-password', [NewPasswordController::class, 'store'])
         ->name('password.store');
 
-    Route::get('aanvragen', [RegistrationRequestController::class, 'create'])
+    Route::get('/registration-request/create', [RegistrationRequestController::class, 'create'])
         ->name('registration-requests.create');
 
-    Route::post('aanvragen', [RegistrationRequestController::class, 'store'])
+    Route::post('/registration-request/create', [RegistrationRequestController::class, 'store'])
         ->name('registration-requests.store')
         ->middleware('throttle:' . config('throttle.registration_requests'));
 
-    Route::get('aanvragen/bedankt', [RegistrationRequestController::class, 'thankYou'])
+    Route::get('/registration-request/thank-you', [RegistrationRequestController::class, 'thankYou'])
         ->name('registration-requests.thank-you');
 });
 

@@ -24,7 +24,7 @@ return [
     'edit' => "Client wijzigen",
     'updated_successfully' => "Client gewijzigd",
     'actions' => 'Acties',
-    'search_placeholder' => "Zoek op ID, Organisatienaam, Hoofdcontact e-mail of FQDN,",
+    'search_placeholder' => "Zoek op ID, Organisatienaam, Hoofdcontact e-mail of FQDN.",
     'search_organisation' => "Zoek organisatie...",
     'active_filter' => [
         'all' => 'Alle',
