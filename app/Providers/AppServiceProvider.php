@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Http\Controllers\ClientController;
 use App\Models\User;
 use App\Policies\UserPolicy;
 use App\Services\ClientChangeNotifier;
+use App\Services\ClientSecret\ClientSecretGeneratorInterface;
+use App\Services\ClientSecret\UuidClientSecretGenerator;
 use App\Support\ExceptionRenderer;
 use App\Support\Str\Initials;
 use Barryvdh\Debugbar\Facades\Debugbar;
@@ -43,6 +46,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->bind(ClientSecretGeneratorInterface::class, UuidClientSecretGenerator::class);
         /**
          * @var Initials $initials
          */
@@ -110,16 +114,24 @@ class AppServiceProvider extends ServiceProvider
 
         if ($this->app->environment('local') === true && config('app.skip_authentication') === true) {
             try {
-                $user = User::query()->firstOrFail();
+                $user = User::where('email', 'test@example.com')->firstOrFail(); // @phpstan-ignore-line
                 Auth::loginUsingId($user->id);
             } catch (Throwable) {
-                // This is just to make sure we don't crash the application if we can't find user 1 for some reason
-                Log::warning('Skipping authentication failed: no user found. Please create a user with ID 1.');
+                // This is just to make sure we don't crash the application if we can't find user with email "test@example.com" for some reason
+                Log::warning('Skipping authentication failed: no user found. Please create a user with email "test@example.com".');
             }
         }
 
         $this->app->when(ClientChangeNotifier::class)
+            ->needs('$verifySsl')
+            ->giveConfig('services.vad.verify_ssl', true);
+
+        $this->app->when(ClientChangeNotifier::class)
             ->needs('$notifiables')
             ->giveConfig('services.vad.notifiables', []);
+
+        $this->app->when(ClientController::class)
+            ->needs('$clientPaginationSize')
+            ->giveConfig('app.default_pagination_size');
     }
 }

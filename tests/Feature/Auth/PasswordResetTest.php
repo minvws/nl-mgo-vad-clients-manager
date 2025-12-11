@@ -9,7 +9,6 @@ use App\Enums\FlashNotificationTypeEnum;
 use App\Models\User;
 use App\Notifications\Auth\UserPasswordReset;
 use App\Services\UserService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use PragmaRX\Google2FA\Google2FA;
 use Tests\TestCase;
@@ -23,8 +22,6 @@ use function trans;
 
 class PasswordResetTest extends TestCase
 {
-    use RefreshDatabase;
-
     public function testResetPasswordLinkScreenCanBeRendered(): void
     {
         $response = $this->get('/forgot-password');

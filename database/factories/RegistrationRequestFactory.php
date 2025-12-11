@@ -27,7 +27,6 @@ class RegistrationRequestFactory extends Factory
             'organisation_main_contact_name' => $this->faker->name,
             'organisation_coc_number' => $this->faker->regexify('[0-9]{8}'),
             'client_redirect_uris' => json_encode([$this->faker->url]),
-            'client_fqdn' => $this->faker->domainName,
             'notes' => $this->faker->optional()->text(512),
         ];
     }

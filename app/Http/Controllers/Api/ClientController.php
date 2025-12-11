@@ -18,11 +18,14 @@ class ClientController extends Controller
 
     public function index(): JsonResponse
     {
+        Log::info('Received GET /api/clients request');
+
         try {
             $clients = $this->clientRepository->allMinimal();
 
             Log::info('GET /api/clients request processed', [
                 'count' => $clients->count(),
+                'client_ids' => $clients->pluck('id')->toArray(),
             ]);
 
             return new JsonResponse(['clients' => $clients], 200);

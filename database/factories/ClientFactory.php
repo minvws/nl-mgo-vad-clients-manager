@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Enums\TokenEndpointAuthMethod;
 use App\Models\Client;
 use App\Models\Organisation;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -24,7 +25,7 @@ class ClientFactory extends Factory
             'id' => Str::uuid(),
             'organisation_id' => Organisation::factory(),
             'redirect_uris' => $urls['redirect_uris'],
-            'fqdn' => $urls['fqdn'],
+            'token_endpoint_auth_method' => TokenEndpointAuthMethod::NONE,
             'active' => $this->faker->boolean,
         ];
     }
@@ -34,15 +35,20 @@ class ClientFactory extends Factory
      */
     private function getUrls(): array
     {
-        $fqdn = $this->faker->unique()->domainName();
         $redirect_uris = [];
         for ($i = 0; $i < 3; $i++) {
-            $redirect_uris[] = 'https://' . $fqdn . '/' . $this->faker->word();
+            $redirect_uris[] = $this->faker->url();
         }
 
         return [
-            'fqdn' => $fqdn,
             'redirect_uris' => $redirect_uris,
         ];
+    }
+
+    public function active(): self
+    {
+        return $this->state(fn() => [
+            'active' => true,
+        ]);
     }
 }

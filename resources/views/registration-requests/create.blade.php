@@ -34,13 +34,6 @@
                 </div>
 
                 <div>
-                    <x-input-label for="client_fqdn" :value="__('registration_request.client_fqdn')" />
-                    <x-text-input id="client_fqdn" name="client_fqdn" type="text" class="mt-1 block w-full" :value="old('client_fqdn')" required />
-                    <p>{{ __('registration_request.client_fqdn_help') }}</p>
-                    <x-input-error class="mt-2" :messages="$errors->get('client_fqdn')" />
-                </div>
-
-                <div>
                     <x-input-label for="client_redirect_uris" :value="__('registration_request.client_redirect_uris')" />
                     <p class="help-text">{{ __('registration_request.client_redirect_uris_help') }}</p>
                     <x-repeater :items="old('client_redirect_uris', [''])" type="url" name="client_redirect_uris" />

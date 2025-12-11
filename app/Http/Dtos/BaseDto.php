@@ -13,8 +13,10 @@ use ReflectionClass;
 use ReflectionNamedType;
 use ReflectionProperty;
 use TypeError;
+use ValueError;
 
 use function array_key_exists;
+use function enum_exists;
 use function gettype;
 use function is_array;
 use function is_bool;
@@ -112,18 +114,56 @@ abstract readonly class BaseDto implements Arrayable
      */
     private function processValueByType(mixed $value, string $typeName, string $name): mixed
     {
-        if ($typeName === 'bool' && !$this->isValidType($value, $typeName) && (is_string($value) || is_int($value))) {
+        if ($typeName === 'bool') {
+            return $this->processBooleanValue($value, $name);
+        }
+
+        if ($typeName === 'int') {
+            return $this->processIntValue($value);
+        }
+
+        if (enum_exists($typeName)) {
+            return $this->processEnumValue($value, $typeName, $name);
+        }
+
+        return $value;
+    }
+
+    /**
+     * @throws TypeError
+     */
+    private function processBooleanValue(mixed $value, string $name): mixed
+    {
+        if (!$this->isValidType($value, 'bool') && (is_string($value) || is_int($value))) {
             try {
                 return $this->resolveBooleanRepresentation($value);
             } catch (CouldNotResolveBooleanRepresentation) {
+                $this->throwTypeError($name, 'bool', $value);
+            }
+        }
+        return $value;
+    }
+
+    private function processIntValue(mixed $value): mixed
+    {
+        if (is_string($value) && is_numeric($value)) {
+            return (int) $value;
+        }
+        return $value;
+    }
+
+    /**
+     * @throws TypeError
+     */
+    private function processEnumValue(mixed $value, string $typeName, string $name): mixed
+    {
+        if (is_string($value)) {
+            try {
+                return $typeName::from($value);
+            } catch (ValueError) {
                 $this->throwTypeError($name, $typeName, $value);
             }
         }
-
-        if ($typeName === 'int' && is_string($value) && is_numeric($value)) {
-            return (int) $value;
-        }
-
         return $value;
     }
 

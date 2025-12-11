@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\TokenEndpointAuthMethod;
 use App\Observers\ClientObserver;
 use Database\Factories\ClientFactory;
 use Eloquent;
@@ -17,9 +18,10 @@ use Illuminate\Support\Carbon;
 
 /**
  * @method static ClientFactory factory($count = null, $state = [])
+ * @method static Builder<static>|Client where(string $column, mixed $operator = null, mixed $value = null, string $boolean = 'and')
+ * @method static Builder<static>|Client select($columns = ['*'])
  * @method static Builder<static>|Client whereActive($value)
  * @method static Builder<static>|Client whereCreatedAt($value)
- * @method static Builder<static>|Client whereFqdn($value)
  * @method static Builder<static>|Client whereId($value)
  * @method static Builder<static>|Client whereOrganisationId($value)
  * @method static Builder<static>|Client whereRedirectUris($value)
@@ -27,7 +29,8 @@ use Illuminate\Support\Carbon;
  * @property string $id
  * @property string $organisation_id
  * @property array $redirect_uris
- * @property string $fqdn
+ * @property string|null $client_secret
+ * @property TokenEndpointAuthMethod $token_endpoint_auth_method
  * @property bool $active
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -47,7 +50,8 @@ class Client extends Model
         'id',
         'organisation_id',
         'redirect_uris',
-        'fqdn',
+        'client_secret',
+        'token_endpoint_auth_method',
         'active',
         'created_at',
         'updated_at',
@@ -56,6 +60,8 @@ class Client extends Model
     /** @var array<string, string> */
     protected $casts = [ //phpcs:ignore 
         'redirect_uris' => 'json',
+        'client_secret' => 'encrypted',
+        'token_endpoint_auth_method' => TokenEndpointAuthMethod::class,
     ];
 
     /**

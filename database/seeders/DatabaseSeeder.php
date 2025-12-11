@@ -9,9 +9,11 @@ use App\Models\Client;
 use App\Models\Organisation;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 use function bcrypt;
 use function encrypt;
+use function env;
 
 class DatabaseSeeder extends Seeder
 {
@@ -29,9 +31,18 @@ class DatabaseSeeder extends Seeder
 
         $user->save();
 
-        $organisation = Organisation::factory()->createOne();
+        $organisationId = env('DEFAULT_ORGANISATION_ID', Str::uuid());
+        $organisation = Organisation::factory()
+            ->state(['id' => $organisationId])
+            ->createOne();
 
-        Client::factory()
+        Client::factory([
+            'redirect_uris' => [
+                'https://test.example.com/callback',
+                'https://test.example.com/another-callback',
+            ],
+            'active' => true,
+        ])
             ->for($organisation)
             ->createQuietly();
     }

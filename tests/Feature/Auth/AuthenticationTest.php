@@ -6,7 +6,6 @@ namespace Tests\Feature\Auth;
 
 use App\Models\User;
 use Illuminate\Auth\Events\Failed;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Support\Facades\Event;
 use PragmaRX\Google2FA\Google2FA;
@@ -19,8 +18,6 @@ use function trans;
 
 class AuthenticationTest extends TestCase
 {
-    use RefreshDatabase;
-
     public function testLoginScreenCanBeRendered(): void
     {
         $response = $this->get('/login');

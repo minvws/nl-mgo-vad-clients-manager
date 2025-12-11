@@ -32,12 +32,8 @@ return [
     'decimal' => 'De :attribute moet :decimal decimalen hebben.',
     'declined' => ':attribute moet afgewezen worden.',
     'declined_if' => ':attribute moet afgewezen worden wanneer :other gelijk is aan :value.',
-    'dependent_fqdn' => [
-        'required_data' => 'De vereiste gegevens ontbreken.',
-        'invalid_redirect_uris_format' => 'Het formaat van de opgegeven redirect URIs is ongeldig.',
-        'invalid_fqdn' => 'Het FQDN-formaat is ongeldig.',
-        'invalid_redirect_uri' => 'De URI :uri is ongeldig.',
-        'host_mismatch' => 'De host van de URI :uri komt niet overeen met de host van het FQDN :fqdnHost.',
+    'uri' => [
+        'invalid_uri' => 'De URI :uri is ongeldig.',
     ],
     'different' => ':attribute en :other moeten verschillend zijn.',
     'digits' => ':attribute moet bestaan uit :digits cijfers.',
@@ -162,11 +158,6 @@ return [
         'email' => [
             'unique' => 'Dit adres is al in gebruik.',
         ],
-        'fqdn' => [
-            'required' => 'Het FQDN field is verplicht.',
-            'regex' => 'Het FQDN moet een geldig Fully Qualified Domain Name zijn.',
-            'unique' => 'FQDN is al in gebruik.'
-        ],
         'redirect_uris.*' => [
             'string' => 'Elke redirect URI moet geldige zijn.',
             'distinct' => 'Redirect URI\'s moeten uniek zijn.',
@@ -182,11 +173,6 @@ return [
         ],
         'client_redirect_uris' => [
             'required' => 'Er moet minstens 1 Redirect URI zijn.'
-        ],
-        'client_fqdn' => [
-            'required' => 'Het FQDN field is verplicht.',
-            'regex' => 'Het FQDN moet een geldig Fully Qualified Domain Name zijn.',
-            'unique' => 'FQDN is al in gebruik.'
         ],
 
     ],
@@ -210,7 +196,7 @@ return [
         'main_contact_name' => 'naam contactpersoon',
         'coc_number' => 'KvK nummer',
         'notes' => 'opmerkingen',
-        'organisation_id' => 'organisatie naam',
+        'organisation_id' => 'Organisatie ID',
         'organisation_name' => 'Organisatie naam',
         'organisation_main_contact_name' => 'Naam contactpersoon',
         'organisation_main_contact_email' => 'Email contactpersoon',

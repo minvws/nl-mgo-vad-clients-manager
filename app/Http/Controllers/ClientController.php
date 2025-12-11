@@ -24,7 +24,9 @@ use function view;
 
 class ClientController extends Controller
 {
-    public const int CLIENT_PAGINATION_SIZE = 25;
+    public function __construct(private readonly int $clientPaginationSize)
+    {
+    }
 
     /**
      * @throws TypeError
@@ -45,7 +47,6 @@ class ClientController extends Controller
         if ($dto->search !== null) {
             $queryBuilder = $queryBuilder->where(
                 static fn(Builder $query) => $query->where('clients.id', 'ilike', '%' . $dto->search . '%')
-                    ->orWhere('clients.fqdn', 'ilike', '%' . $dto->search . '%')
                     ->orWhereRelation('organisation', 'name', 'ilike', '%' . $dto->search . '%')
                     ->orWhereRelation('organisation', 'main_contact_email', 'ilike', '%' . $dto->search . '%'),
             );
@@ -55,7 +56,8 @@ class ClientController extends Controller
             $queryBuilder->where('clients.active', $dto->active);
         }
 
-        $paginator = $queryBuilder->paginate(self::CLIENT_PAGINATION_SIZE);
+        $paginator = $queryBuilder->paginate($this->clientPaginationSize);
+
         if ($paginator instanceof LengthAwarePaginator) {
             $paginator->withQueryString();
         }
@@ -85,7 +87,7 @@ class ClientController extends Controller
             [
                 'organisation_id' => $dto->organisation_id,
                 'redirect_uris' => $dto->redirect_uris,
-                'fqdn' => $dto->fqdn,
+                'token_endpoint_auth_method' => $dto->token_endpoint_auth_method,
                 'active' => $dto->active,
             ],
         );
@@ -112,7 +114,7 @@ class ClientController extends Controller
         $client->update([
             'organisation_id' => $dto->organisation_id,
             'redirect_uris' => $dto->redirect_uris,
-            'fqdn' => $dto->fqdn,
+            'token_endpoint_auth_method' => $dto->token_endpoint_auth_method,
             'active' => $dto->active,
         ]);
 

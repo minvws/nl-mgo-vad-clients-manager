@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 use function config;
@@ -14,8 +13,6 @@ use function route;
 
 class RegistrationRequestControllerTest extends TestCase
 {
-    use RefreshDatabase;
-
     public function testRegistrationRequestFormCanBeRendered(): void
     {
         $response = $this->get(route('registration-requests.create'));
@@ -30,7 +27,6 @@ class RegistrationRequestControllerTest extends TestCase
             'organisation_main_contact_name' => 'John Doe',
             'organisation_main_contact_email' => 'john.doe@example.com',
             'organisation_coc_number' => '00345678',
-            'client_fqdn' => 'example.com',
             'client_redirect_uris' => ['https://example.com/callback'],
         ]);
 
@@ -41,7 +37,6 @@ class RegistrationRequestControllerTest extends TestCase
             'organisation_main_contact_name' => 'John Doe',
             'organisation_main_contact_email' => 'john.doe@example.com',
             'organisation_coc_number' => '00345678',
-            'client_fqdn' => 'example.com',
             'client_redirect_uris' => json_encode(['https://example.com/callback']),
         ]);
     }
@@ -53,7 +48,6 @@ class RegistrationRequestControllerTest extends TestCase
             'organisation_main_contact_name' => '',
             'organisation_main_contact_email' => 'invalid-email',
             'organisation_coc_number' => '123',
-            'client_fqdn' => 'invalid-fqdn',
             'client_redirect_uris' => [],
         ]);
 
@@ -62,7 +56,6 @@ class RegistrationRequestControllerTest extends TestCase
             'organisation_main_contact_name',
             'organisation_main_contact_email',
             'organisation_coc_number',
-            'client_fqdn',
             'client_redirect_uris',
         ]);
     }
@@ -74,18 +67,12 @@ class RegistrationRequestControllerTest extends TestCase
             'organisation_main_contact_name' => 'John Doe',
             'organisation_main_contact_email' => 'john.doe@example.com',
             'organisation_coc_number' => '12345678',
-            'client_fqdn' => 'example.com',
-            'client_redirect_uris' => ['http://example.com/redirect', 'http://wrong'],
+            'client_redirect_uris' => ['http://example.com/redirect', 'invalid-uri'],
         ]);
 
         $response->assertSessionHasErrors([
             'client_redirect_uris.*',
         ]);
-
-        $this->assertEquals(
-            ['client_redirect_uris.1' => ['De host van de URI http://wrong komt niet overeen met de host van het FQDN example.com.']],
-            $response->exception->validator->errors()->toArray(),
-        );
     }
 
     public function testRegistrationRequestThrottling(): void
@@ -99,7 +86,6 @@ class RegistrationRequestControllerTest extends TestCase
                 'organisation_main_contact_name' => 'John Doe',
                 'organisation_main_contact_email' => 'john.doe@example.com',
                 'organisation_coc_number' => '12345678',
-                'client_fqdn' => 'example' . $i . '.com',
                 'client_redirect_uris' => ['https://example.com/callback'],
             ]);
         }
@@ -110,7 +96,6 @@ class RegistrationRequestControllerTest extends TestCase
             'organisation_main_contact_name' => 'John Doe',
             'organisation_main_contact_email' => 'john.doe@example.com',
             'organisation_coc_number' => '12345678',
-            'client_fqdn' => 'example' . ($maxAttempts + 1) . '.com',
             'client_redirect_uris' => ['https://example.com/callback'],
         ]);
 

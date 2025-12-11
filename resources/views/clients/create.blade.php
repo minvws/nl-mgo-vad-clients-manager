@@ -25,9 +25,16 @@
                         <x-input-error :messages="$errors->get('organisation_id')" class="error" />
                     </div>
                     <div>
-                        <x-input-label for="fqdn" :value="__('client.fqdn')" />
-                        <x-text-input id="fqdn" type="text" name="fqdn" :value="old('fqdn')" required />
-                        <x-input-error :messages="$errors->get('fqdn')" class="error" />
+                    <div>
+                        <x-input-label for="token_endpoint_auth_method" :value="__('client.token_endpoint_auth_method')" />
+                        <x-searchable-select
+                            name="token_endpoint_auth_method"
+                            :options="App\Enums\TokenEndpointAuthMethod::toArray()"
+                            :selected="old('token_endpoint_auth_method', 'none')"
+                            :placeholder="__('client.token_endpoint_auth_method')"
+                            required
+                        />
+                        <x-input-error :messages="$errors->get('token_endpoint_auth_method')" class="error" />
                     </div>
                     <div>
                         <x-input-label for="redirect_uris" :value="__('client.redirect_uris')" />

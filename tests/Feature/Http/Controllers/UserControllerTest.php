@@ -11,7 +11,6 @@ use App\Models\User;
 use App\Notifications\Auth\UserReset;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use PHPUnit\Framework\Attributes\TestWith;
 use Tests\TestCase;
@@ -28,8 +27,6 @@ use function trans;
 
 class UserControllerTest extends TestCase
 {
-    use RefreshDatabase;
-
     #[TestWith(['/users'], 'user list')]
     #[TestWith(['/users/create'], 'user creation')]
     #[TestWith(['/users/{userId}'], 'user edit')]

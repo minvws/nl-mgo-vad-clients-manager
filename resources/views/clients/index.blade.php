@@ -1,8 +1,8 @@
 @props([
-    'search' => '',
-    'sort',
-    'direction',
-    'active' => null
+'search' => '',
+'sort',
+'direction',
+'active' => null
 ])
 
 <x-app-layout>
@@ -31,73 +31,60 @@
                 </div>
             </form>
         </div>
-
         <div class="visually-grouped">
             <table>
                 <thead>
-                <tr>
-                    <th scope="col">{{ __('client.id') }}</th>
-                    <x-sortable-header
-                        route="clients.index"
-                        :sort="$sort"
-                        :direction="$direction"
-                        :search="$search"
-                        :active="$active"
-                        sortField="organisations.name"
-                        :label="__('client.owner_organisation.name')"
-                    />
-                    <x-sortable-header
-                        route="clients.index"
-                        :sort="$sort"
-                        :direction="$direction"
-                        :search="$search"
-                        :active="$active"
-                        sortField="organisations.main_contact_email"
-                        :label="__('client.owner_organisation.main_contact_email')"
-                    />
-                    <x-sortable-header
-                        route="clients.index"
-                        :sort="$sort"
-                        :direction="$direction"
-                        :search="$search"
-                        :active="$active"
-                        sortField="clients.fqdn"
-                        :label="__('client.fqdn')"
-                    />
-                    <th scope="col">{{ __('client.redirect_uris') }}</th>
-                    <x-sortable-header
-                        route="clients.index"
-                        :sort="$sort"
-                        :direction="$direction"
-                        :search="$search"
-                        :active="$active"
-                        sortField="clients.created_at"
-                        :label="__('client.created_at_header')"
-                    />
-                    <x-sortable-header
-                        route="clients.index"
-                        :sort="$sort"
-                        :direction="$direction"
-                        :search="$search"
-                        :active="$active"
-                        sortField="clients.updated_at"
-                        :label="__('client.updated_at_header')"
-                    />
-                    <th scope="col">{{ __('client.active') }}</th>
-                    <th scope="col">{{ __('client.actions') }}</th>
-                </tr>
+                    <tr>
+                        <th scope="col">{{ __('client.id') }}</th>
+                        <x-sortable-header
+                            route="clients.index"
+                            :sort="$sort"
+                            :direction="$direction"
+                            :search="$search"
+                            :active="$active"
+                            sortField="organisations.name"
+                            :label="__('client.owner_organisation.name')" />
+                        <x-sortable-header
+                            route="clients.index"
+                            :sort="$sort"
+                            :direction="$direction"
+                            :search="$search"
+                            :active="$active"
+                            sortField="organisations.main_contact_email"
+                            :label="__('client.owner_organisation.main_contact_email')" />
+                        <th scope="col">{{ __('client.token_endpoint_auth_method') }}</th>
+                        <th scope="col">{{ __('client.redirect_uris') }}</th>
+                        <x-sortable-header
+                            route="clients.index"
+                            :sort="$sort"
+                            :direction="$direction"
+                            :search="$search"
+                            :active="$active"
+                            sortField="clients.created_at"
+                            :label="__('client.created_at_header')" />
+                        <x-sortable-header
+                            route="clients.index"
+                            :sort="$sort"
+                            :direction="$direction"
+                            :search="$search"
+                            :active="$active"
+                            sortField="clients.updated_at"
+                            :label="__('client.updated_at_header')" />
+                        <th scope="col">{{ __('client.active') }}</th>
+                        <th scope="col">{{ __('client.actions') }}</th>
+                    </tr>
                 </thead>
                 <tbody>
-                @foreach($clients as $client)
+                    @foreach($clients as $client)
                     <tr>
                         <th scope="row">{{ $client->id }}</th>
                         <td>{{ $client->organisation->name}}</td>
                         <td>{{ $client->organisation->main_contact_email}}</td>
-                        <td>{{ $client->fqdn }}</td>
+                        <td>{{ __('client.token_endpoint_auth_method_' . $client->token_endpoint_auth_method->value) }}</td>
                         <td>
                             <ul class="no-margin-padding">
                                 @foreach($client->redirect_uris as $uri)
-                                    <li>{{ $uri }}</li>
+                                <li>{{ $uri }}</li>
                                 @endforeach
                             </ul>
                         </td>
@@ -105,9 +92,9 @@
                         <td>{{ $client->updated_at }}</td>
                         <td>
                             @if($client->active)
-                                <x-tabler-circle-check fill="green" />
+                            <x-tabler-circle-check fill="green" />
                             @else
-                                <x-tabler-circle-x  fill="red" />
+                            <x-tabler-circle-x fill="red" />
                             @endif
                         </td>
                         <td class="action-buttons">
@@ -116,7 +103,7 @@
                             </a>
                         </td>
                     </tr>
-                @endforeach
+                    @endforeach
                 </tbody>
             </table>
         </div>

@@ -39,5 +39,6 @@ return [
 
     'vad' => [
         'notifiables' => explode(',', env('VAD_NOTIFIABLES', '')), // @phpstan-ignore-line as string is the only possible type
+        'verify_ssl' => env('VAD_NOTIFY_VERIFY_SSL', true),
     ],
 ];

@@ -13,7 +13,10 @@ class ClientControllerTest extends TestCase
 {
     public function testClientsIndexReturnsSuccessfulResponse(): void
     {
-        Client::factory()->count(3)->create();
+        Client::query()->delete();
+        Client::factory()->active()->count(3)->create([
+            'client_secret' => $this->faker->uuid,
+        ]);
 
         $response = $this->getJson('/api/v1/clients');
         $response->assertStatus(200);
@@ -23,14 +26,21 @@ class ClientControllerTest extends TestCase
                     'id',
                     'organisation_id',
                     'redirect_uris',
-                    'fqdn',
                     'active',
+                    'client_secret',
                     'created_at',
                     'updated_at',
                 ],
             ],
         ]);
         $response->assertJsonCount(3, 'clients');
+
+        $responseData = $response->json();
+        foreach ($responseData['clients'] as $clientData) {
+            $this->assertNotNull($clientData['client_secret']);
+            $this->assertIsString($clientData['client_secret']);
+            $this->assertNotEmpty($clientData['client_secret']);
+        }
     }
 
     public function testClientsIndexReturnsEmptyArrayWhenNoClients(): void
@@ -40,6 +50,20 @@ class ClientControllerTest extends TestCase
         $response->assertJson([
             'clients' => [],
         ]);
+    }
+
+    public function testClientsIndexHandlesClientsWithoutClientSecret(): void
+    {
+        Client::query()->delete();
+        $client = Client::factory()->active()->create();
+
+        $client->update(['client_secret' => null]);
+
+        $response = $this->getJson('/api/v1/clients');
+        $response->assertStatus(200);
+
+        $responseData = $response->json();
+        $this->assertNull($responseData['clients'][0]['client_secret']);
     }
 
     public function testClientsIndexReturns500WhenExceptionOccurs(): void

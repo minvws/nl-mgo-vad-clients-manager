@@ -32,7 +32,6 @@ class RegistrationRequestController extends Controller
                 'organisation_main_contact_email' => $dto->organisation_main_contact_email,
                 'organisation_main_contact_name' => $dto->organisation_main_contact_name,
                 'organisation_coc_number' => $dto->organisation_coc_number,
-                'client_fqdn' => $dto->client_fqdn,
                 'client_redirect_uris' => $dto->client_redirect_uris,
             ],
         );

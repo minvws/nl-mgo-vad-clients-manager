@@ -4,39 +4,93 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Observer;
 
+use App\Enums\TokenEndpointAuthMethod;
+use App\Models\Client;
 use App\Observers\ClientObserver;
 use App\Services\ClientChangeNotifier;
+use App\Services\ClientSecretProvisioner;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\MockObject\MockObject;
 use Tests\TestCase;
 
 #[CoversClass(ClientObserver::class)]
 class ClientObserverTest extends TestCase
 {
-    #[DataProvider('observerMethodsProvider')]
-    public function testNotifierIsTriggeredForObserverMethods(string $method): void
+    private ClientChangeNotifier|MockObject $mockNotifier;
+    private ClientSecretProvisioner|MockObject $mockProvisioner;
+    private ClientObserver $observer;
+
+    protected function setUp(): void
     {
-        $mockNotifier = $this->getMockBuilder(ClientChangeNotifier::class)
+        parent::setUp();
+
+        $this->mockNotifier = $this->getMockBuilder(ClientChangeNotifier::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['notify'])
             ->getMock();
 
+        $this->mockProvisioner = $this->getMockBuilder(ClientSecretProvisioner::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['generateAndNotify'])
+            ->getMock();
 
-
-        $observer = new ClientObserver($mockNotifier, 'http://example.com/notify');
-
-        $mockNotifier->expects($this->once())
-            ->method('notify');
-
-        $observer->{$method}();
+        $this->observer = new ClientObserver($this->mockNotifier, $this->mockProvisioner);
     }
 
-    public static function observerMethodsProvider(): array
+    public function testCreatedGeneratesSecretAndNotifies(): void
     {
-        return [
-            ['created'],
-            ['updated'],
-            ['deleted'],
-        ];
+        $client = Client::factory()->make([
+            'token_endpoint_auth_method' => TokenEndpointAuthMethod::CLIENT_SECRET,
+        ]);
+
+        $this->mockProvisioner->expects($this->once())
+            ->method('generateAndNotify')
+            ->with($client);
+
+        $this->mockNotifier->expects($this->once())
+            ->method('notify');
+
+        $this->observer->created($client);
+    }
+
+    public function testCreatedDoesNotGenerateSecretForNoneAuthMethod(): void
+    {
+        $client = Client::factory()->make([
+            'token_endpoint_auth_method' => TokenEndpointAuthMethod::NONE,
+        ]);
+
+        $this->mockProvisioner->expects($this->never())
+            ->method('generateAndNotify');
+
+        $this->mockNotifier->expects($this->once())
+            ->method('notify');
+
+        $this->observer->created($client);
+    }
+
+    public function testUpdatedNotifiesWithoutSecretGeneration(): void
+    {
+        $client = Client::factory()->make();
+
+        $this->mockNotifier->expects($this->once())
+            ->method('notify');
+
+        $this->mockProvisioner->expects($this->never())
+            ->method('generateAndNotify');
+
+        $this->observer->updated($client);
+    }
+
+    public function testDeletedNotifiesWithoutSecretGeneration(): void
+    {
+        $client = Client::factory()->make();
+
+        $this->mockNotifier->expects($this->once())
+            ->method('notify');
+
+        $this->mockProvisioner->expects($this->never())
+            ->method('generateAndNotify');
+
+        $this->observer->deleted($client);
     }
 }

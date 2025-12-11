@@ -130,4 +130,5 @@ return [
 
 
     'skip_authentication' => env('SKIP_AUTHENTICATION', false),
+    'default_pagination_size' => env('DEFAULT_PAGINATION_SIZE', 25),
 ];

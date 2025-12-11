@@ -16,11 +16,18 @@ class AppServiceProviderTest extends TestCase
 {
     public function testAutoLoginWhenInLocalEnvironmentWithSkipAuthentication(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create([
+            'email' => 'test@example.com',
+        ]);
 
         $this->app->detectEnvironment(function () {
             return 'local';
         });
+
+        $this->app->runningInConsole(function () {
+            return false;
+        });
+
         Config::set('app.skip_authentication', true);
 
         $provider = new AppServiceProvider($this->app);

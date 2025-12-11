@@ -7,14 +7,11 @@ namespace Tests\Feature\Auth;
 use App\Components\FlashNotification;
 use App\Enums\FlashNotificationTypeEnum;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class PasswordUpdateTest extends TestCase
 {
-    use RefreshDatabase;
-
     public function testPasswordCanBeUpdated(): void
     {
         $user = User::factory()->create();

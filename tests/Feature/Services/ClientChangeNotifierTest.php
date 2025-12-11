@@ -2,13 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Tests\Feature;
+namespace Tests\Feature\Services;
 
 use App\Services\ClientChangeNotifier;
+use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
+use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Log\LoggerInterface;
 use Tests\TestCase;
 
+use function array_key_exists;
 use function in_array;
 
 class ClientChangeNotifierTest extends TestCase
@@ -38,7 +43,7 @@ class ClientChangeNotifierTest extends TestCase
                 }),
             );
 
-        $notifier = new ClientChangeNotifier($logger, $urls[0], $urls[1]);
+        $notifier = new ClientChangeNotifier($logger, true, $urls[0], $urls[1]);
         $notifier->notify();
 
         Http::assertSentCount(2);
@@ -72,7 +77,7 @@ class ClientChangeNotifierTest extends TestCase
                 }),
             );
 
-        $notifier = new ClientChangeNotifier($logger, ...$urls);
+        $notifier = new ClientChangeNotifier($logger, true, ...$urls);
         $notifier->notify();
 
         Http::assertSentCount(4);
@@ -94,9 +99,54 @@ class ClientChangeNotifierTest extends TestCase
                 }),
             );
 
-        $notifier = new ClientChangeNotifier($logger, $invalidUrl);
+        $notifier = new ClientChangeNotifier($logger, true, $invalidUrl);
         $notifier->notify();
 
         Http::assertNothingSent();
+    }
+
+    #[DataProvider('verifySslDataProvider')]
+    public function testNotifyWithDifferentVerifySslSettings(bool $verifySsl): void
+    {
+        $url = 'https://example.com/notify';
+        $logger = $this->getMockBuilder(LoggerInterface::class)->getMock();
+        $logger->expects($this->once())
+            ->method('debug')
+            ->with(
+                $this->equalTo('Notifying client change'),
+                $this->callback(function ($context) {
+                    return
+                        isset($context['url'])
+                        && isset($context['timestamp'])
+                        && $context['response_status'] === 200;
+                }),
+            );
+
+        $responseMock = Mockery::mock(Response::class);
+        $responseMock->shouldReceive('status')->andReturn(200);
+        $responseMock->shouldReceive('throw')->andReturnSelf();
+
+        $pendingRequestMock = Mockery::mock(PendingRequest::class);
+        $pendingRequestMock->shouldReceive('retry')->andReturnSelf();
+        $pendingRequestMock->shouldReceive('post')->with($url)->andReturn($responseMock);
+
+        Http::shouldReceive('withOptions')
+            ->once()
+            ->with(Mockery::on(fn($options) => array_key_exists('verify', $options) && $options['verify'] === $verifySsl))
+            ->andReturn($pendingRequestMock);
+
+        $notifier = new ClientChangeNotifier($logger, $verifySsl, $url);
+        $notifier->notify();
+    }
+
+    /**
+     * @return array<string, array<bool>>
+     */
+    public static function verifySslDataProvider(): array
+    {
+        return [
+            'verify SSL enabled' => [true],
+            'verify SSL disabled' => [false],
+        ];
     }
 }

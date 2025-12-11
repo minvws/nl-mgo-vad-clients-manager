@@ -16,7 +16,6 @@ class IndexRequest extends TypedRequest
     private array $allowedSortOptions = [
         'clients.created_at',
         'clients.updated_at',
-        'clients.fqdn',
         'organisations.name',
         'organisations.main_contact_email',
     ];

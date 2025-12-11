@@ -6,7 +6,7 @@ namespace App\Http\Requests\RegistrationRequest;
 
 use App\Http\Dtos\RegistrationRequest\CreateRequestDto;
 use App\Http\Requests\TypedRequest;
-use App\Rules\FQDNMatchRule;
+use App\Rules\UriValidatorRule;
 use Illuminate\Contracts\Validation\ValidationRule;
 
 class CreateRequest extends TypedRequest
@@ -37,10 +37,6 @@ class CreateRequest extends TypedRequest
                 'string',
                 'digits:8',
             ],
-            'client_fqdn' => [
-                'required',
-                'regex:' . \App\Http\Requests\Client\CreateRequest::FQDN_REG_EX,
-            ],
             'client_redirect_uris' => [
                 'required',
                 'array',
@@ -50,7 +46,7 @@ class CreateRequest extends TypedRequest
                 'required',
                 'string',
                 'distinct:strict',
-                new FQDNMatchRule(),
+                new UriValidatorRule(),
             ],
         ];
     }

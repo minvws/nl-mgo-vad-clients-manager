@@ -19,12 +19,19 @@ readonly class TestDto extends BaseDto
     public int $id;
     public string $name;
     public bool $is_active;
+    public ?FooBarEnum $enum_field;
 }
 
 // phpcs:ignore
 readonly class TestDtoWithUnionTypes extends BaseDto
 {
     public int|string $id;
+}
+
+//phpcs:ignore
+enum FooBarEnum : string{
+    case FOO = 'foo';
+    case BAR = 'bar';
 }
 
 
@@ -36,12 +43,15 @@ class BaseDtoTest extends TestCase //phpcs:ignore
             'id' => 1,
             'name' => 'Test Name',
             'is_active' => true,
+            'enum_field' => FooBarEnum::FOO,
         ];
 
         $dto = new TestDto($data);
 
         $this->assertEquals($data['id'], $dto->id);
         $this->assertEquals($data['name'], $dto->name);
+        $this->assertEquals($data['is_active'], $dto->is_active);
+        $this->assertEquals($data['enum_field'], $dto->enum_field);
     }
 
     public function testBaseDtoThrowsExceptionOnMissingData(): void
@@ -122,6 +132,7 @@ class BaseDtoTest extends TestCase //phpcs:ignore
             'id' => 1,
             'name' => 'Test Name',
             'is_active' => true,
+            'enum_field' => FooBarEnum::BAR,
         ];
 
         $dto = new TestDto($data);

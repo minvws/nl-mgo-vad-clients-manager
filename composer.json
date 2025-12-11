@@ -13,7 +13,6 @@
         "laravel/framework": "^11.9",
         "laravel/tinker": "^2.9",
         "minvws/laravel-logging": "^3.1",
-        "minvws/laravel-sql-exporter": "^1.1",
         "secondnetwork/blade-tabler-icons": "^3.31",
         "spatie/laravel-csp": "^2.10"
     },
@@ -26,6 +25,7 @@
         "laravel/breeze": "^2.1",
         "laravel/pint": "^1.13",
         "laravel/sail": "^1.30",
+        "minvws/laravel-sql-exporter": "^1.1",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.0",
         "phpmd/phpmd": "^2.15",

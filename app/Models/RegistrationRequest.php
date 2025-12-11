@@ -17,7 +17,6 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|RegistrationRequest newModelQuery()
  * @method static Builder<static>|RegistrationRequest newQuery()
  * @method static Builder<static>|RegistrationRequest query()
- * @method static Builder<static>|RegistrationRequest whereClientFqdn($value)
  * @method static Builder<static>|RegistrationRequest whereClientRedirectUris($value)
  * @method static Builder<static>|RegistrationRequest whereCreatedAt($value)
  * @method static Builder<static>|RegistrationRequest whereId($value)
@@ -33,7 +32,6 @@ use Illuminate\Support\Carbon;
  * @property string $organisation_main_contact_name
  * @property string $organisation_coc_number
  * @property string $client_redirect_uris
- * @property string $client_fqdn
  * @property string|null $notes
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -53,7 +51,6 @@ class RegistrationRequest extends Model
         'organisation_main_contact_name',
         'organisation_coc_number',
         'client_redirect_uris',
-        'client_fqdn',
         'notes',
     ];
 

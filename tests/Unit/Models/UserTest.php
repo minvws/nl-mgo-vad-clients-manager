@@ -6,13 +6,10 @@ namespace Tests\Unit\Models;
 
 use App\Enums\Role;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class UserTest extends TestCase
 {
-    use RefreshDatabase;
-
     public function testMarkAsRegistered(): void
     {
         $user = User::factory()->create();

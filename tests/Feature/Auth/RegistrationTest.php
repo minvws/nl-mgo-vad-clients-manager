@@ -8,7 +8,6 @@ use App\Components\FlashNotification;
 use App\Enums\FlashNotificationTypeEnum;
 use App\Models\User;
 use App\Services\UserService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use PragmaRX\Google2FA\Google2FA;
 use Tests\TestCase;
@@ -23,8 +22,6 @@ use function route;
 
 class RegistrationTest extends TestCase
 {
-    use RefreshDatabase;
-
     public function testRegistrationScreenCanBeRendered(): void
     {
         $registrationToken = Str::random(32);

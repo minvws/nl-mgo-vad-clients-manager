@@ -1,1 +1,1 @@
-2025_06_02_131619_alter_users_email_unique_constraint.php
+2025_11_14_143000_add_token_endpoint_auth_method_to_clients_table.php

@@ -10,8 +10,6 @@ return [
     'organisation_main_contact_name' => 'Naam contactpersoon',
     'organisation_main_contact_email' => 'E-mailadres contactpersoon',
     'organisation_coc_number' => 'KvK-nummer',
-    'client_fqdn' => 'FQDN',
-    'client_fqdn_help' => 'Het domein waarop uw client actief is.',
     'client_redirect_uris' => 'Redirect URIs',
     'client_redirect_uris_help' => 'Voeg hier de redirect URIs toe die je wilt gebruiken voor deze client.',
     'submit' => 'Indienen',
@@ -31,4 +29,4 @@ return [
         ],
         'contact' => 'Heeft u vragen? Neem dan contact op met de beheerder.',
     ],
-]; 
+];

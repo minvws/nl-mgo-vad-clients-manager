@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers;
 
-use App\Http\Controllers\ClientController;
+use App\Enums\TokenEndpointAuthMethod;
 use App\Models\Client;
 use App\Models\Organisation;
 use App\Models\User;
@@ -14,9 +14,9 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 use function assert;
+use function config;
 use function fake;
 use function http_build_query;
-use function json_encode;
 use function route;
 use function sprintf;
 use function substr;
@@ -33,14 +33,13 @@ class ClientControllerTest extends TestCase
 
     public function testIndexShowsClients(): void
     {
-        $clients = Client::factory()->count(ClientController::CLIENT_PAGINATION_SIZE)->create();
+        $clients = Client::factory()->count(3)->create();
         $this->login();
         $response = $this->get('/clients');
         $response->assertStatus(200);
 
         foreach ($clients as $client) {
             $response->assertSee($client->id);
-            $response->assertSee($client->fqdn);
             $response->assertSee($client->redirect_uris);
             $response->assertSee($client->active);
             $response->assertSee($client->organisation->name);
@@ -50,10 +49,14 @@ class ClientControllerTest extends TestCase
 
     public function testIndexShowsPagination(): void
     {
+        $extraSmallPageSize = 1;
+
+        config()->set(['app.default_pagination_size' => $extraSmallPageSize]);
+
         Client::factory()
             ->count(fake()->numberBetween(
-                ClientController::CLIENT_PAGINATION_SIZE + 1,
-                ClientController::CLIENT_PAGINATION_SIZE + 50,
+                $extraSmallPageSize + 1,
+                $extraSmallPageSize + 2,
             ))
             ->create();
 
@@ -80,63 +83,22 @@ class ClientControllerTest extends TestCase
         $organisation = Organisation::factory()->create();
 
         $response = $this->post(route('clients.create'), [
-            'fqdn' => 'host.test.com',
             'redirect_uris' => [
                 'https://host.test.com/callback',
             ],
             'active' => true,
             'organisation_id' => (string) $organisation->id,
+            'token_endpoint_auth_method' => TokenEndpointAuthMethod::CLIENT_SECRET->value,
         ]);
 
         $response->assertStatus(302);
         $response->assertRedirect('/clients');
 
         $this->assertDatabaseHas('clients', [
-            'fqdn' => 'host.test.com',
             'organisation_id' => $organisation->id,
             'redirect_uris' => '["https://host.test.com/callback"]',
-        ]);
-    }
-
-    public function testStoreWithDifferingFqdn(): void
-    {
-        $this->login();
-
-        $organisation = Organisation::factory()->create();
-
-        $response = $this->post(route('clients.create'), [
-            'fqdn' => 'https://host.test.com',
-            'redirect_uris' => 'https://host.anotherhost.com/callback',
-            'organisation_id' => $organisation->id,
-        ]);
-
-        $response->assertStatus(302);
-        $response->assertSessionHasErrors('fqdn');
-        $this->assertDatabaseMissing('clients', [
-            'fqdn' => 'https://host.test.com',
-            'organisation_id' => $organisation->id,
-            'redirect_uris' => json_encode('https://host.anotherhost.com/callback'),
-        ]);
-    }
-
-    public function testStoreWithDuplicateFqdn(): void
-    {
-        Client::factory()->create(['fqdn' => 'host.test.com']);
-
-        $this->login();
-
-        $organisation = Organisation::factory()->create();
-
-        $response = $this->post(route('clients.create'), [
-            'fqdn' => 'host.test.com',
-            'redirect_uris' => ['https://host.test.com/callback'],
-            'organisation_id' => $organisation->id,
             'active' => true,
-        ]);
-
-        $response->assertStatus(302);
-        $response->assertSessionHasErrors([
-            'fqdn' => 'FQDN is al in gebruik.',
+            'token_endpoint_auth_method' => 'client_secret_post',
         ]);
     }
 
@@ -160,21 +122,22 @@ class ClientControllerTest extends TestCase
             ->create();
 
         $response = $this->put(sprintf('/clients/%s', $client->id), [
-            'fqdn' => 'host.test.com',
             'redirect_uris' => [
                 'https://host.test.com/callback',
             ],
             'active' => true,
             'organisation_id' => (string) $organisation->id,
+            'token_endpoint_auth_method' => TokenEndpointAuthMethod::CLIENT_SECRET->value,
         ]);
 
         $response->assertStatus(302);
         $response->assertRedirect('/clients');
 
         $this->assertDatabaseHas('clients', [
-            'fqdn' => 'host.test.com',
             'organisation_id' => $organisation->id,
             'redirect_uris' => '["https://host.test.com/callback"]',
+            'active' => true,
+            'token_endpoint_auth_method' => 'client_secret_post',
         ]);
     }
 
@@ -188,7 +151,6 @@ class ClientControllerTest extends TestCase
             ->create();
 
         $response = $this->put(sprintf('/clients/%s', $client->id), [
-            'fqdn' => 'host.test.com',
             'redirect_uris' => [
                 '',
                 'https://host.test.com/callback',
@@ -211,7 +173,6 @@ class ClientControllerTest extends TestCase
             ->create();
 
         $response = $this->put(sprintf('/clients/%s', $client->id), [
-            'fqdn' => 'host.test.com',
             'active' => true,
             'organisation_id' => $organisation->id,
         ]);
@@ -223,17 +184,13 @@ class ClientControllerTest extends TestCase
     public function testIndexSearch(): void
     {
         $this->login();
-        $client = Client::factory()->create([
-            'fqdn' => 'unique-search-term.test.com',
-        ]);
-        $unexpectedClient = Client::factory()->create([
-            'fqdn' => 'unrelated-domain.test.com',
-        ]);
+        $client = Client::factory()->create();
+        $unexpectedClient = Client::factory()->create();
 
-        $response = $this->get('/clients?search=unique-search-term');
+        $response = $this->get('/clients?search=' . substr((string) $client->id, 0, 8));
         $response->assertStatus(200);
-        $response->assertSee($client->fqdn);
-        $response->assertDontSee($unexpectedClient->fqdn);
+        $response->assertSee($client->id);
+        $response->assertDontSee($unexpectedClient->id);
     }
 
     public function testIndexSearchFieldIsVisible(): void
@@ -243,29 +200,6 @@ class ClientControllerTest extends TestCase
         $response = $this->get('/clients');
         $response->assertStatus(200);
         $response->assertSee('name="search"', false);
-    }
-
-    public function testSearchByFQDN(): void
-    {
-        $this->login();
-
-        $expectedClient = Client::factory()
-            ->for(Organisation::factory())
-            ->create([
-                'fqdn' => 'unique-search-term.test.com',
-            ]);
-
-        $unexpectedClient = Client::factory()
-            ->for(Organisation::factory())
-            ->create([
-                'fqdn' => 'unrelated-domain.test.com',
-            ]);
-
-        $response = $this->get('/clients?search=unique-search-term');
-        $response->assertStatus(200);
-
-        $response->assertSee($expectedClient->id);
-        $response->assertDontSee($unexpectedClient->id);
     }
 
     public function testSearchByPartialClientID(): void
@@ -318,22 +252,6 @@ class ClientControllerTest extends TestCase
         $response->assertDontSee($unexpectedClient->id);
     }
 
-    public function testCaseInsensitiveSearch(): void
-    {
-        $this->login();
-
-        $expectedClient = Client::factory()->for(
-            Organisation::factory(),
-        )->create(
-            ['fqdn' => 'https://UPPERCASE.test.com'],
-        );
-
-        $response = $this->get('/clients?search=uppercase');
-        $response->assertStatus(200);
-
-        $response->assertSee($expectedClient->id);
-    }
-
     public function testEmptySearchShowsAllClients(): void
     {
         $this->login();
@@ -345,7 +263,6 @@ class ClientControllerTest extends TestCase
 
         foreach ($clients as $client) {
             $response->assertSee($client->id);
-            $response->assertSee($client->fqdn);
         }
     }
 
@@ -388,31 +305,6 @@ class ClientControllerTest extends TestCase
             'sort' => I18n::trans('validation.in', [
                 'attribute' => 'sort',
             ]),
-        ]);
-    }
-
-    public function testIndexFqdnSort(): void
-    {
-        $this->login();
-        $clientA = Client::factory()->create([
-            'fqdn' => 'https://aaa.test.com',
-        ]);
-        $clientB = Client::factory()->create([
-            'fqdn' => 'https://bbb.test.com',
-        ]);
-
-        $response = $this->get('/clients?sort=clients.fqdn&direction=asc');
-        $response->assertStatus(200);
-        $response->assertSeeInOrder([
-            $clientA->id,
-            $clientB->id,
-        ]);
-
-        $response = $this->get('/clients?sort=clients.fqdn&direction=desc');
-        $response->assertStatus(200);
-        $response->assertSeeInOrder([
-            $clientB->id,
-            $clientA->id,
         ]);
     }
 
@@ -482,7 +374,7 @@ class ClientControllerTest extends TestCase
         $response->assertDontSee($clientC->id);
     }
 
-     #[dataProvider('activeStatusProvider')]
+    #[dataProvider('activeStatusProvider')]
     public function testClientIndexCanBeFilteredOnActiveStatus(mixed $active, int $expectedCount): void
     {
         $user = User::factory()->create();

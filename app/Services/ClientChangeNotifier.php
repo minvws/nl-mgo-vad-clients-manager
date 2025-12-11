@@ -23,6 +23,7 @@ class ClientChangeNotifier
 
     public function __construct(
         private readonly LoggerInterface $logger,
+        private readonly bool $verifySsl,
         string ...$notifiables,
     ) {
         $this->notifiables = collect($notifiables);
@@ -42,7 +43,8 @@ class ClientChangeNotifier
             }
 
             try {
-                $response = Http::retry(3, 100)
+                $response = Http::withOptions(['verify' => $this->verifySsl])
+                    ->retry(3, 100)
                     ->post($url)
                     ->throw();
 

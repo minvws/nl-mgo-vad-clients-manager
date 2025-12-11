@@ -6,7 +6,6 @@ namespace Tests\Feature\Http\Middleware;
 
 use App\Enums\Role;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
@@ -16,8 +15,6 @@ use function route;
 
 class Requires2FATest extends TestCase
 {
-    use RefreshDatabase;
-
     public function testUserWith2FAEnabledCanAccess(): void
     {
         $user = User::factory()->create(['two_factor_secret' => 'secret']);
