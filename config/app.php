@@ -59,7 +59,7 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
-    'trusted_hosts' => env('TRUSTED_HOSTS', ['localhost']),
+    'trusted_hosts' => array_filter(explode(',', env('TRUSTED_HOSTS', 'localhost'))),
 
     /*
     |--------------------------------------------------------------------------

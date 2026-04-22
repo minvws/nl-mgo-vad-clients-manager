@@ -27,6 +27,7 @@ parameters:
         -
             message: '#Class App\\Http\\Dtos\\.+ has an uninitialized readonly property \$\w+. Assign it in the constructor.#'
             identifier: property.uninitializedReadonly
-            paths:
-                - app/Http/Dtos/*
-
+            path: app/Http/Dtos/*
+        -
+            message: '~Parameter #2 \$string of function explode expects string, mixed given~'
+            path: config/app.php
